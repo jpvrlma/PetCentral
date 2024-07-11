@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">CENTRAL DO PET</string>
+    <string name="bem_vindo">Bem-vindo!</string>
+    <string name="corpo_bem_vindo">Insira suas informações para realizar o Login!</string>
+    <string name="criar_conta">Criar Conta</string>
+    <string name="esqueci_conta">Esqueci minha senha</string>
+    <string name="cadastro_conta">Faça seu Cadastro!</string>
+    <string name="cadastro_btn">CADASTRO</string>
+    <string name="login_btn">LOGIN</string>
+    <string name="nome">Nome</string>
+    <string name="email">Email</string>
+    <string name="senha">Senha</string>
+    <string name="data_nasc">Data de Nascimento</string>
+    <string name="email_rec">Insira seu email!</string>
+    <string name="enviar_rec">Redefinir a senha</string>
+    <string name="main_msg">Bom dia!</string>
+    <string name="main_person">pedro@gmail.com</string>
+    <string name="main_pet">Seus Pets</string>
+</resources>
