@@ -6,6 +6,7 @@
     <string name="esqueci_conta">Esqueci minha senha</string>
     <string name="cadastro_conta">Faça seu Cadastro!</string>
     <string name="cadastro_btn">CADASTRO</string>
+    <string name="cadastro_sexo">Sexo</string>
     <string name="login_btn">LOGIN</string>
     <string name="nome">Nome</string>
     <string name="email">Email</string>
@@ -14,6 +15,121 @@
     <string name="email_rec">Insira seu email!</string>
     <string name="enviar_rec">Redefinir a senha</string>
     <string name="main_msg">Bom dia!</string>
-    <string name="main_person">pedro@gmail.com</string>
-    <string name="main_pet">Seus Pets</string>
+    <string name="main_person">Email</string>
+    <string name="main_pet">Meus Pets</string>
+    <string name="main_nome">Joao Pedro Vieira Lima</string>
+    <string name="nome_pet">Nome</string>
+    <string name="rec_especie">Espécie: </string>
+    <string name="rec_idade">Idade:  </string>
+    <string name="rec_raca"> Raça:  </string>
+    <string name="rec_ultima">Última atividade:  </string>
+    <string name="tol_back">Voltar </string>
+    <string name="err_set">Campo obrigatório </string>
+    <string name="snack_Vazio">Campos obrigatórios estão vazios. Por favor, preencha todos os campos para continuar. </string>
+    <string name="snack_emailInvalido">O email digitado é inválido. Por favor, digite um email válido. </string>
+    <string name="snack_senhaInvalida">Sua senha precisa ter pelo menos 6 caracteres. </string>
+    <string name="snack_emailEnviado"> Email para redefinicao de senha foi enviado com sucesso! </string>
+    <string name="tool_cadastre"> Cadastre seu Pet! </string>
+    <string name="pet_nome"> Cadastre seu Pet! </string>
+    <string name="pet_especie"> Espécie </string>
+    <string name="pet_raca"> Raça </string>
+    <string name="pet_dtNasc"> Data de Nascimento </string>
+    <string name="pet_sexo"> Sexo </string>
+    <string name="pet_cancelar"> CANCELAR </string>
+    <string name="pet_cadastro"> CADASTRAR </string>
+    <string name="firebase_erro_cadastro"> Algo saiu mal </string>
+    <string name="firebase_cadastro_sucesso"> Pet cadastrado com sucesso! </string>
+    <string name="tool_perfil"> Perfil </string>
+    <string name="user_perfil"> UserNome </string>
+    <string name="email_perfil"> user@email.com </string>
+    <string name="settings_perfil"> Configurações </string>
+    <string name="edita_perfil"> Editar perfil </string>
+    <string name="logout_perfil"> Sair </string>
+
+
+    <!-- Arrays -->
+
+    <string-array name="SexoArray">
+        <item>Macho</item>
+        <item>Fêmea</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="EspecieArray">
+        <item>Cachorro</item>
+        <item>Gato</item>
+        <item>Hamster</item>
+        <item>Ave</item>
+        <item>Peixe</item>
+    </string-array>
+
+    <string-array name="CachorroArray">
+        <item>Sem raça definida</item>
+        <item>Labrador Retriever</item>
+        <item>Poodle</item>
+        <item>Bulldog Francês</item>
+        <item>Golden Retriever</item>
+        <item>Shih Tzu</item>
+        <item>Beagle</item>
+        <item>Pastor Alemão</item>
+        <item>Yorkshire Terrier</item>
+        <item>Dachshund</item>
+        <item>Boxer</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="GatoArray">
+        <item>Sem raça definida</item>
+        <item>Persa</item>
+        <item>Siamês</item>
+        <item>Maine Coon</item>
+        <item>Sphynx</item>
+        <item>Bengal</item>
+        <item>Ragdoll</item>
+        <item>Siberiano</item>
+        <item>Abissínio</item>
+        <item>British Shorthair</item>
+        <item>Himalaio</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="HamsterArray">
+        <item>Sem raça definida</item>
+        <item>Hamster Dourado</item>
+        <item>Hamster Sírio</item>
+        <item>Hamster Anão Russo</item>
+        <item>Hamster Anão do Campbell</item>
+        <item>Hamster Roborovski</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="AveArray">
+        <item>Sem raça definida</item>
+        <item>Canário</item>
+        <item>Periquito</item>
+        <item>Agapornis</item>
+        <item>Calopsita</item>
+        <item>Tico-tico</item>
+        <item>Galo-da-índia</item>
+        <item>Tucano</item>
+        <item>Papagaio</item>
+        <item>Coruja</item>
+        <item>Falcão</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="PeixeArray">
+        <item>Sem raça definida</item>
+        <item>Betta</item>
+        <item>Neon Tetra</item>
+        <item>Molly</item>
+        <item>Guppy</item>
+        <item>Ciclídeo</item>
+        <item>Pterophyllum (Escalar)</item>
+        <item>Carpa</item>
+        <item>Peixe-Papagaio</item>
+        <item>Peixe-Lanterna</item>
+        <item>Peixe-Rainbow</item>
+        <item>Outro</item>
+    </string-array>
 </resources>

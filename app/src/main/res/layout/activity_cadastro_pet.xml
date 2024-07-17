@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CadastroActivity">
+    tools:context=".CadastroPetActivity">
 
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -22,106 +18,118 @@
         app:navigationIconTint="@color/md_theme_primary">
 
         <TextView
-            android:text="@string/tol_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="@string/tool_cadastre"
             style="@style/TextAppearance.AppCompat.Headline"
             android:textColor="@color/md_theme_primary"
             android:textStyle="bold" />
 
     </androidx.appcompat.widget.Toolbar>
 
-    <TextView
-        android:id="@+id/textFaca"
-        style="@style/TextAppearance.AppCompat.Display1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:text="@string/cadastro_conta"
-        android:textColor="@color/md_theme_primary"
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/petAvatar"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/media"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imgCadastro" />
-
-    <ImageView
-        android:id="@+id/imgCadastro"
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:src="@drawable/img_cadastro"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:layout_constraintVertical_bias="0.0"
+        app:shapeAppearanceOverlay="@style/AvatarShape"
+        app:strokeColor="@color/md_theme_primary"
+        app:strokeWidth="2dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/container_nome"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="16dp"
         android:hint="@string/nome"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/textFaca">
+        app:layout_constraintTop_toBottomOf="@+id/petAvatar">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/edit_nome"
+            android:id="@+id/editNome"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="172dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.062"
+            app:layout_constraintStart_toStartOf="parent">
+
+        </com.google.android.material.textfield.TextInputEditText>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/container_email"
-        android:hint="@string/email"
-        app:boxStrokeColor="@color/md_theme_primary"
-        app:hintTextColor="@color/md_theme_primary"
+        android:id="@+id/menu_especie"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/pet_especie"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container_nome">
+        app:layout_constraintTop_toBottomOf="@+id/container_nome">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editEmail"
+        <TextView
+            android:id="@+id/textErrorEspecie"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/design_default_color_error"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/menu_especie"
+            app:layout_constraintTop_toBottomOf="@id/menu_especie" />
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/autoCompleteEspecie"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="10dp">
-
-        </com.google.android.material.textfield.TextInputEditText>
+            android:inputType="none"
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/container_Senha"
-        android:hint="@string/senha"
-        app:boxStrokeColor="@color/md_theme_primary"
-        app:hintTextColor="@color/md_theme_primary"
+        android:id="@+id/menu_raca"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/pet_raca"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container_email">
+        app:layout_constraintTop_toBottomOf="@+id/menu_especie">
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/editSenha"
-            android:inputType="textPassword"
+        <TextView
+            android:id="@+id/textErrorRaca"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="@color/design_default_color_error"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="@id/menu_raca"
+            app:layout_constraintTop_toBottomOf="@id/menu_raca" />
+
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/autoCompleteRaca"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:drawablePadding="10dp">
-
-        </com.google.android.material.textfield.TextInputEditText>
+            android:inputType="none"
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -135,16 +143,17 @@
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container_Senha">
+        app:layout_constraintTop_toBottomOf="@id/menu_raca">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_sexo"
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/cadastro_sexo"
+            android:hint="@string/pet_sexo"
             android:layout_weight="1"
-            android:layout_marginEnd="4dp">
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp">
 
             <TextView
                 android:id="@+id/textErrorSexo"
@@ -158,7 +167,7 @@
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:focusable="false"
-                android:id="@+id/editSexo"
+                android:id="@+id/autoCompleteSexo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"/>
@@ -169,9 +178,10 @@
             android:id="@+id/container_data"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/data_nasc"
+            android:hint="@string/pet_dtNasc"
             android:layout_weight="1"
-            android:layout_marginStart="4dp">
+            android:layout_marginStart="4dp"
+            android:layout_marginEnd="8dp">
 
             <TextView
                 android:id="@+id/textErrorData"
@@ -191,36 +201,41 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btncadastrar"
-        style="@style/Widget.Material3.Button"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        app:cornerRadius="5dp"
-        android:text="@string/cadastro_btn"
-        android:textColor="@color/md_theme_onPrimary"
-        app:layout_constraintBottom_toBottomOf="parent"
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/container_sexo_data"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@id/container_sexo_data">
+
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btn_cadastrar"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_weight="1"
+            android:text="@string/pet_cadastro" />
+
+    </LinearLayout>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
-        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_gravity="center"
+        android:layout_marginTop="16dp"
         android:indeterminate="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btncadastrar" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-</androidx.core.widget.NestedScrollView>
