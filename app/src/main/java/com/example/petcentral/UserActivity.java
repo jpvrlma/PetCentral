@@ -32,7 +32,7 @@ public class UserActivity extends AppCompatActivity {
         binding = ActivityUserBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -43,6 +43,7 @@ public class UserActivity extends AppCompatActivity {
 
     }
 
+    //Método para pegar os dados do usuário do Firestore e atualizar a interface de usuário
     private void getUsuario() {
         String userID = mAuth.getCurrentUser().getUid();
         db.collection("Usuarios").document(userID).addSnapshotListener(this, (value, error) -> {
@@ -63,6 +64,8 @@ public class UserActivity extends AppCompatActivity {
 
     private void clickListeners() {
         binding.cardConfiguracoes.setOnClickListener(v-> startActivity(new Intent(this, SettingsActivity.class)));
-        binding.cardEditarPerfil.setOnClickListener(v-> startActivity(new Intent(this, editUserActivity.class)));
+        binding.cardConfiguracoes.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        }
     }
-}
+
+

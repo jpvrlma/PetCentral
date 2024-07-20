@@ -45,6 +45,7 @@
     <string name="settings_perfil"> Configurações </string>
     <string name="edita_perfil"> Editar perfil </string>
     <string name="logout_perfil"> Sair </string>
+    <string name="raca_pet"> Selecione uma espécie primeiro </string>
 
 
     <!-- Arrays -->

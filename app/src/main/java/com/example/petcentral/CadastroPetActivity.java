@@ -42,7 +42,7 @@ public class CadastroPetActivity extends AppCompatActivity {
         binding = ActivityCadastroPetBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -138,18 +138,23 @@ public class CadastroPetActivity extends AppCompatActivity {
         switch (itemSelecionado) {
             case "Cachorro":
                 inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.CachorroArray);
+                binding.menuRaca.setHint(getString(R.string.pet_raca));
                 break;
             case "Gato":
                 inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.GatoArray);
+                binding.menuRaca.setHint(getString(R.string.pet_raca));
                 break;
             case "Hamster":
                 inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.HamsterArray);
+                binding.menuRaca.setHint(getString(R.string.pet_raca));
                 break;
             case "Ave":
                 inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.AveArray);
+                binding.menuRaca.setHint(getString(R.string.pet_raca));
                 break;
             case "Peixe":
                 inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.PeixeArray);
+                binding.menuRaca.setHint(getString(R.string.pet_raca));
                 break;
         }
     }

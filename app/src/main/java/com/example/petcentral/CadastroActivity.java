@@ -45,11 +45,8 @@ public class CadastroActivity extends AppCompatActivity {
         binding = ActivityCadastroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        autoCompleteTextViewSexo = binding.editSexo;
-        inicializarAutoCompleteTextView(autoCompleteTextViewSexo, R.array.SexoArray);
 
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
@@ -63,7 +60,6 @@ public class CadastroActivity extends AppCompatActivity {
     //Método para configurar o clique dos botões da atividade
     private void clickListeners() {
         binding.btncadastrar.setOnClickListener(v -> validarCampos());
-        binding.editData.setOnClickListener(v -> startDatePicker());
     }
 
     //Método para verificar se o formato do email digitado é valido
@@ -84,10 +80,8 @@ public class CadastroActivity extends AppCompatActivity {
         String nome = binding.editNome.getText().toString().trim();
         String email = binding.editEmail.getText().toString().trim();
         String senha = binding.editSenha.getText().toString().trim();
-        String sexo = binding.editSexo.getText().toString().trim();
-        String dataNascimento = binding.editData.getText().toString().trim();
 
-        if (nome.isEmpty() && email.isEmpty() && senha.isEmpty() && sexo.isEmpty() && dataNascimento.isEmpty()) {
+        if (nome.isEmpty() && email.isEmpty() && senha.isEmpty()) {
             mostrarSnackbar(getString(R.string.snack_Vazio));
         } else if (nome.isEmpty()) {
             binding.editNome.setError(getString(R.string.err_set));
@@ -99,26 +93,18 @@ public class CadastroActivity extends AppCompatActivity {
             binding.editSenha.setError(getString(R.string.err_set));
         } else if (senha.length() < 6) {
             binding.editSenha.setError(getString(R.string.snack_senhaInvalida));
-        } else if (sexo.isEmpty()) {
-            binding.textErrorSexo.setVisibility(View.VISIBLE);
-            binding.textErrorSexo.setText(getString(R.string.err_set));
-        } else if (dataNascimento.isEmpty()) {
-            binding.textErrorData.setVisibility(View.VISIBLE);
-            binding.textErrorData.setText(getString(R.string.err_set));
         } else {
-            binding.editSexo.setText(sexo);
             binding.progressBar.setVisibility(View.VISIBLE);
-            cadastrarFirebase(nome, email, senha, sexo, dataNascimento);
+            cadastrarFirebase(nome, email, senha);
         }
     }
 
-    //    Método para realizar o cadastro no Firebase
-    private void cadastrarFirebase(String nome, String email, String senha, String sexo, String dataNascimento) {
-        Timestamp timestamp = converterParaTimestamp(dataNascimento);
+    //Método para realizar o cadastro no Firebase
+    private void cadastrarFirebase(String nome, String email, String senha) {
         mAuth.createUserWithEmailAndPassword(email, senha)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Usuario user = new Usuario(nome, email, sexo, timestamp);
+                        Usuario user = new Usuario(nome, email);
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
                             String userId = firebaseUser.getUid();
@@ -146,35 +132,4 @@ public class CadastroActivity extends AppCompatActivity {
         mostrarSnackbar(erro);
     }
 
-    //Método para abrir o DatePicker do Material
-    private void startDatePicker() {
-        MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
-                .setTitleText("Selecione uma data")
-                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
-                .build();
-        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
-            String date = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date(selection));
-            binding.editData.setText(date);
-        });
-        materialDatePicker.show(getSupportFragmentManager(), "TAG");
-    }
-
-    //Método para inicializar autoComplete (Dropdown)
-    private void inicializarAutoCompleteTextView(AutoCompleteTextView autoCompleteTextView, int arrayResourceId) {
-        String[] opcoes = getResources().getStringArray(arrayResourceId);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, opcoes);
-        autoCompleteTextView.setAdapter(adapter);
-    }
-
-    //Método para converter uma data em string para Timestamp
-    private Timestamp converterParaTimestamp(String dataStr) {
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date dtNascimento = dateFormat.parse(dataStr);
-            return new Timestamp(dtNascimento);
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
 }

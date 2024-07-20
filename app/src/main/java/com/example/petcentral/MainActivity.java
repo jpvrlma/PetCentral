@@ -1,7 +1,6 @@
 package com.example.petcentral;
 
 
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +25,7 @@ import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.util.ArrayList;
@@ -69,23 +69,28 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    // Método que adiciona um listener que será chamado sempre que houver uma mudança na coleção "Pets" e adiciona os documentos na lista do adaptador
     private void EventChangeListener() {
         String userID = mAuth.getCurrentUser().getUid();
         db.collection("Usuarios").document(userID).collection("Pets").orderBy(FieldPath.documentId(), Query.Direction.DESCENDING)
-                .addSnapshotListener((value, error) -> {
-                    if (error != null){
-                        Log.e("ERRO FIRESTORE", error.getMessage());
-                        petArrayList.clear();
-                        return;
-                    }
-                        for (DocumentChange dc : value.getDocumentChanges()){
-                            if (dc.getType() == DocumentChange.Type.ADDED){
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+
+                        if (error != null) {
+                            Log.e("ERRO FIRESTORE", error.getMessage());
+                            return;
+                        }
+                        for (DocumentChange dc : value.getDocumentChanges()) {
+                            if (dc.getType() == DocumentChange.Type.ADDED) {
                                 petArrayList.add(dc.getDocument().toObject(Pet.class));
                             }
                         }
                         petAdapter.notifyDataSetChanged();
+                    }
                 });
     }
+
 
 
     private void clickListeners() {
