@@ -98,7 +98,7 @@ public class CadastroPetActivity extends AppCompatActivity {
             binding.autoCompleteEspecie.setText(especie);
             binding.autoCompleteRaca.setText(raca);
             binding.autoCompleteSexo.setText(sexo);
-            binding.editData.setText(sexo);
+            binding.editData.setText(dataNascimento);
             binding.progressBar.setVisibility(View.VISIBLE);
             salvarFirebase(nome, especie, raca, sexo, dataNascimento);
         }

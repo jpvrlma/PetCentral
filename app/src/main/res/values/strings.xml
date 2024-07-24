@@ -43,9 +43,16 @@
     <string name="user_perfil"> UserNome </string>
     <string name="email_perfil"> user@email.com </string>
     <string name="settings_perfil"> Configurações </string>
+    <string name="settings_logout"> Sair </string>
     <string name="edita_perfil"> Editar perfil </string>
     <string name="logout_perfil"> Sair </string>
     <string name="raca_pet"> Selecione uma espécie primeiro </string>
+    <string name="edit_foto"> Escolher uma foto </string>
+    <string name="edit_salvar"> Salvar </string>
+    <string name="edit_telefone"> Telefone </string>
+    <string name="edit_sexo"> Sexo </string>
+    <string name="edit_datanasc"> Data de Nascimento </string>
+    <string name="edit_editarseus"> Atualize seus Dados! </string>
 
 
     <!-- Arrays -->

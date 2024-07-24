@@ -37,6 +37,7 @@
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:scaleType="centerCrop"
+        android:padding="8dp"
         android:src="@drawable/media"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -46,7 +47,7 @@
         app:layout_constraintVertical_bias="0.0"
         app:shapeAppearanceOverlay="@style/AvatarShape"
         app:strokeColor="@color/md_theme_primary"
-        app:strokeWidth="2dp" />
+        app:strokeWidth="4dp" />
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/container_nome"
