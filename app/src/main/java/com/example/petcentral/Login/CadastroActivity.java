@@ -1,11 +1,9 @@
-package com.example.petcentral;
+package com.example.petcentral.Login;
 
 
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,8 +11,9 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.Objetos.Usuario;
+import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityCadastroBinding;
-import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthUserCollisionException;
@@ -22,20 +21,17 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.google.firebase.Timestamp;
+import java.util.Objects;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+/**
+ * Esta atividade irá cadastrar o usuário no Firebase Authentication e no Firestore
+ */
 
 public class CadastroActivity extends AppCompatActivity {
 
     private ActivityCadastroBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-
-    AutoCompleteTextView autoCompleteTextViewSexo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +41,10 @@ public class CadastroActivity extends AppCompatActivity {
         binding = ActivityCadastroBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+
+        clickListeners();
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -52,22 +52,16 @@ public class CadastroActivity extends AppCompatActivity {
             return insets;
         });
 
-        clickListeners();
-        db = FirebaseFirestore.getInstance();
-        mAuth = FirebaseAuth.getInstance();
     }
 
-    //Método para configurar o clique dos botões da atividade
     private void clickListeners() {
         binding.btncadastrar.setOnClickListener(v -> validarCampos());
     }
 
-    //Método para verificar se o formato do email digitado é valido
     private boolean isEmailValido(String email) {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    //Método para exibir uma snackbar ao usuário informando que os campos estão vazios ou inválidos
     private void mostrarSnackbar(String mensagem) {
         Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(getColor(R.color.md_theme_primary))
@@ -75,31 +69,39 @@ public class CadastroActivity extends AppCompatActivity {
                 .show();
     }
 
-    //Método para validar os campos preenchidos
     private void validarCampos() {
-        String nome = binding.editNome.getText().toString().trim();
-        String email = binding.editEmail.getText().toString().trim();
-        String senha = binding.editSenha.getText().toString().trim();
+        final String nome = Objects.requireNonNull(binding.editNome.getText()).toString().trim();
+        final String email = Objects.requireNonNull(binding.editEmail.getText()).toString().trim();
+        final String senha = Objects.requireNonNull(binding.editSenha.getText()).toString().trim();
 
         if (nome.isEmpty() && email.isEmpty() && senha.isEmpty()) {
-            mostrarSnackbar(getString(R.string.snack_Vazio));
-        } else if (nome.isEmpty()) {
-            binding.editNome.setError(getString(R.string.err_set));
-        } else if (email.isEmpty()) {
-            binding.editEmail.setError(getString(R.string.err_set));
-        } else if (!isEmailValido(email)) {
-            binding.editEmail.setError(getString(R.string.snack_emailInvalido));
-        } else if (senha.isEmpty()) {
-            binding.editSenha.setError(getString(R.string.err_set));
-        } else if (senha.length() < 6) {
-            binding.editSenha.setError(getString(R.string.snack_senhaInvalida));
-        } else {
-            binding.progressBar.setVisibility(View.VISIBLE);
-            cadastrarFirebase(nome, email, senha);
+            mostrarSnackbar("Campos obrigatórios estão vazios. Por favor, preencha todos os campos para continuar.");
+            return;
         }
+        if (nome.isEmpty()) {
+            binding.containerNome.setError("Campo obrigatório");
+            return;
+        }
+        if (email.isEmpty()) {
+            binding.containerEmail.setError("Campo obrigatório");
+            return;
+        }
+        if (!isEmailValido(email)) {
+            binding.containerEmail.setError("O email digitado é inválido. Por favor, digite um email válido.");
+            return;
+        }
+        if (senha.isEmpty()) {
+            binding.containerSenha.setError("Campo obrigatório");
+            return;
+        }
+        if (senha.length() < 6) {
+            binding.containerSenha.setError("Sua senha precisa ter pelo menos 6 caracteres.");
+            return;
+        }
+        binding.progressBar.setVisibility(View.VISIBLE);
+        cadastrarFirebase(nome, email, senha);
     }
 
-    //Método para realizar o cadastro no Firebase
     private void cadastrarFirebase(String nome, String email, String senha) {
         mAuth.createUserWithEmailAndPassword(email, senha)
                 .addOnCompleteListener(this, task -> {
@@ -107,8 +109,7 @@ public class CadastroActivity extends AppCompatActivity {
                         Usuario user = new Usuario(nome, email);
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
-                            String userId = firebaseUser.getUid();
-                            db.collection("Usuarios").document(userId).set(user);
+                            db.collection("usuarios").document(firebaseUser.getUid()).set(user);
                             binding.progressBar.setVisibility(View.GONE);
                             mostrarSnackbar("Cadastro realizado com sucesso!");
                         }
@@ -119,7 +120,6 @@ public class CadastroActivity extends AppCompatActivity {
                 });
     }
 
-    //Método para exibir possiveis erros de cadastro
     private void errosCadastro(Exception exception) {
         String erro;
         if (exception instanceof FirebaseAuthUserCollisionException) {
@@ -131,5 +131,4 @@ public class CadastroActivity extends AppCompatActivity {
         }
         mostrarSnackbar(erro);
     }
-
 }

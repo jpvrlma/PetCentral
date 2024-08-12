@@ -1,65 +1,44 @@
 <resources>
     <string name="app_name">CENTRAL DO PET</string>
-    <string name="bem_vindo">Bem-vindo!</string>
-    <string name="corpo_bem_vindo">Insira suas informações para realizar o Login!</string>
-    <string name="criar_conta">Criar Conta</string>
-    <string name="esqueci_conta">Esqueci minha senha</string>
-    <string name="cadastro_conta">Faça seu Cadastro!</string>
-    <string name="cadastro_btn">CADASTRO</string>
-    <string name="cadastro_sexo">Sexo</string>
-    <string name="login_btn">LOGIN</string>
-    <string name="nome">Nome</string>
-    <string name="email">Email</string>
-    <string name="senha">Senha</string>
-    <string name="data_nasc">Data de Nascimento</string>
-    <string name="email_rec">Insira seu email!</string>
-    <string name="enviar_rec">Redefinir a senha</string>
-    <string name="main_msg">Bom dia!</string>
-    <string name="main_person">Email</string>
-    <string name="main_pet">Meus Pets</string>
-    <string name="main_nome">Joao Pedro Vieira Lima</string>
-    <string name="nome_pet">Nome</string>
-    <string name="rec_especie">Espécie: </string>
-    <string name="rec_idade">Idade:  </string>
-    <string name="rec_raca"> Raça:  </string>
-    <string name="rec_ultima">Última atividade:  </string>
-    <string name="tol_back">Voltar </string>
-    <string name="err_set">Campo obrigatório </string>
-    <string name="snack_Vazio">Campos obrigatórios estão vazios. Por favor, preencha todos os campos para continuar. </string>
-    <string name="snack_emailInvalido">O email digitado é inválido. Por favor, digite um email válido. </string>
-    <string name="snack_senhaInvalida">Sua senha precisa ter pelo menos 6 caracteres. </string>
-    <string name="snack_emailEnviado"> Email para redefinicao de senha foi enviado com sucesso! </string>
-    <string name="tool_cadastre"> Cadastre seu Pet! </string>
-    <string name="pet_nome"> Cadastre seu Pet! </string>
-    <string name="pet_especie"> Espécie </string>
-    <string name="pet_raca"> Raça </string>
-    <string name="pet_dtNasc"> Data de Nascimento </string>
-    <string name="pet_sexo"> Sexo </string>
-    <string name="pet_cancelar"> CANCELAR </string>
-    <string name="pet_cadastro"> CADASTRAR </string>
-    <string name="firebase_erro_cadastro"> Algo saiu mal </string>
-    <string name="firebase_cadastro_sucesso"> Pet cadastrado com sucesso! </string>
-    <string name="tool_perfil"> Perfil </string>
-    <string name="user_perfil"> UserNome </string>
-    <string name="email_perfil"> user@email.com </string>
-    <string name="settings_perfil"> Configurações </string>
-    <string name="settings_logout"> Sair </string>
-    <string name="edita_perfil"> Editar perfil </string>
-    <string name="logout_perfil"> Sair </string>
-    <string name="raca_pet"> Selecione uma espécie primeiro </string>
-    <string name="edit_foto"> Escolher uma foto </string>
-    <string name="edit_salvar"> Salvar </string>
-    <string name="edit_telefone"> Telefone </string>
-    <string name="edit_sexo"> Sexo </string>
-    <string name="edit_datanasc"> Data de Nascimento </string>
-    <string name="edit_editarseus"> Atualize seus Dados! </string>
-
+    <string name="login_saudacao">Bem Vindo!</string>
+    <string name="login_info">Insira suas informações para realizar o Login</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_senha">Senha</string>
+    <string name="login_esqueci">Esqueci minha senha</string>
+    <string name="login_criar">Criar conta</string>
+    <string name="btn_login">Login</string>
+    <string name="tool_voltar">Voltar</string>
+    <string name="reset_insira">Insira seu email!</string>
+    <string name="reset_btn_redefinir">Redefinir a senha</string>
+    <string name="main_saudacao">Saudação</string>
+    <string name="main_seus_pets">Seus Pets</string>
+    <string name="cadastro_faca">Faça seu Cadastro!</string>
+    <string name="hint_nome">Nome</string>
+    <string name="btn_cadastro">Cadastrar</string>
+    <string name="pet_cadastre">Cadastre um pet</string>
+    <string name="hint_especie">Espécie</string>
+    <string name="hint_raca">Raça</string>
+    <string name="hint_sexo">Sexo</string>
+    <string name="hint_data">Data de Nascimento</string>
+    <string name="user_nome">nome_user</string>
+    <string name="user_email">email_user</string>
+    <string name="settings_config">Configurações</string>
+    <string name="settings_logout">Sair</string>
+    <string name="att_perfil">Atualize seu perfil!</string>
+    <string name="att_foto">Carregue sua foto de perfil</string>
+    <string name="btn_salvar">Salvar</string>
 
     <!-- Arrays -->
 
     <string-array name="SexoArray">
         <item>Macho</item>
         <item>Fêmea</item>
+        <item>Outro</item>
+    </string-array>
+
+    <string-array name="GeneroArray">
+        <item>Masculino</item>
+        <item>Feminino</item>
         <item>Outro</item>
     </string-array>
 
@@ -140,4 +119,5 @@
         <item>Peixe-Rainbow</item>
         <item>Outro</item>
     </string-array>
+
 </resources>

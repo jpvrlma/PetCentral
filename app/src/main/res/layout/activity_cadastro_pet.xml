@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CadastroPetActivity">
+    tools:context=".Pets.CadastroPetActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -26,7 +26,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/tool_cadastre"
+            android:text="@string/pet_cadastre"
             android:textColor="@color/md_theme_primary"
             android:textStyle="bold" />
 
@@ -34,11 +34,12 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/petAvatar"
+        android:src="@drawable/upload"
+        android:tint="@color/md_theme_primary"
         android:layout_width="180dp"
         android:layout_height="180dp"
         android:scaleType="centerCrop"
         android:padding="8dp"
-        android:src="@drawable/media"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -57,7 +58,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="24dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/nome"
+        android:hint="@string/hint_nome"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,23 +84,15 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/pet_especie"
+        android:hint="@string/hint_especie"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/container_nome">
 
-        <TextView
-            android:id="@+id/textErrorEspecie"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/design_default_color_error"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@id/menu_especie"
-            app:layout_constraintTop_toBottomOf="@id/menu_especie" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/autoCompleteEspecie"
+            android:paddingEnd="48dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
@@ -115,23 +108,15 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/raca_pet"
+        android:hint="@string/hint_raca"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu_especie">
 
-        <TextView
-            android:id="@+id/textErrorRaca"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/design_default_color_error"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@id/menu_raca"
-            app:layout_constraintTop_toBottomOf="@id/menu_raca" />
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/autoCompleteRaca"
+            android:paddingEnd="48dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
@@ -156,24 +141,16 @@
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/pet_sexo"
+            android:hint="@string/hint_sexo"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:layout_marginStart="8dp">
 
-            <TextView
-                android:id="@+id/textErrorSexo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/design_default_color_error"
-                android:visibility="gone"
-                app:layout_constraintStart_toStartOf="@id/container_sexo"
-                app:layout_constraintTop_toBottomOf="@id/container_sexo" />
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:focusable="false"
                 android:id="@+id/autoCompleteSexo"
+                android:paddingEnd="48dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"/>
@@ -184,7 +161,7 @@
             android:id="@+id/container_data"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="@string/pet_dtNasc"
+            android:hint="@string/hint_data"
             android:layout_weight="1"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="8dp">
@@ -226,7 +203,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_weight="1"
-            android:text="@string/pet_cadastro" />
+            android:text="@string/btn_cadastro" />
 
     </LinearLayout>
 

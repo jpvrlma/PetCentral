@@ -1,4 +1,4 @@
-package com.example.petcentral;
+package com.example.petcentral.Usuario;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,10 +10,17 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.Login.LoginActivity;
 import com.example.petcentral.databinding.ActivityUserBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+/**
+ * Esta atividade irá exibir as configurações do usuário
+ * permitirá o acesso a edição de dados do usuário
+ * e o logout da sua conta
+ */
 
 public class UserActivity extends AppCompatActivity {
 
@@ -43,13 +50,11 @@ public class UserActivity extends AppCompatActivity {
 
     }
 
-    //Método para pegar os dados do usuário do Firestore e atualizar a interface de usuário
     private void getUsuario() {
-        String userID = mAuth.getCurrentUser().getUid();
-        db.collection("Usuarios").document(userID).addSnapshotListener(this, (value, error) -> {
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .addSnapshotListener(this, (value, error) -> {
             if (error != null){
-                Log.e("ERRO FIRESTORE DATA", error.getMessage());
-                return;
+                Log.e("DATA NAO CARREGA", error.getMessage());
             } else {
                 if (value != null && value.exists()) {
                     DocumentSnapshot documentSnapshot = value;

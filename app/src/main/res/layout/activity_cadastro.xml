@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CadastroActivity">
+    tools:context=".Login.CadastroActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -31,7 +31,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="@string/tol_back"
+                android:text="@string/tool_voltar"
                 android:textColor="@color/md_theme_primary"
                 android:textStyle="bold" />
 
@@ -53,7 +53,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="@string/cadastro_conta"
+            android:text="@string/cadastro_faca"
             android:textColor="@color/md_theme_primary"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -61,10 +61,13 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_nome"
+            android:hint="@string/hint_nome"
+            app:errorEnabled="true"
+            app:counterEnabled="true"
+            app:counterMaxLength="30"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:hint="@string/nome"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/textFaca">
@@ -77,10 +80,11 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_email"
+            android:hint="@string/hint_email"
+            app:errorEnabled="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/email"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/container_nome">
@@ -95,10 +99,11 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_Senha"
+            android:hint="@string/hint_senha"
+            app:errorEnabled="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="@string/senha"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/container_email">
@@ -114,12 +119,12 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btncadastrar"
-            style="@style/Widget.Material3.Button"
+            style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"
             android:layout_height="54dp"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
-            android:text="@string/cadastro_btn"
+            android:text="@string/btn_cadastro"
             android:textColor="@color/md_theme_onPrimary"
             app:cornerRadius="5dp"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"

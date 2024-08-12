@@ -1,4 +1,4 @@
-package com.example.petcentral;
+package com.example.petcentral.Login;
 
 import android.os.Bundle;
 import android.util.Patterns;
@@ -9,9 +9,18 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityResetBinding;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+
+import java.util.Objects;
+
+/**
+ * Esta atividade é responsável por fazer o reset de senha do usuário no aplicativo
+ * Irá validar as informações passados no clique do botao de redefinição
+ * e irá retornar um email para que ele possoa alterar sua senha.
+ */
 
 public class ResetActivity extends AppCompatActivity {
 
@@ -22,8 +31,13 @@ public class ResetActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
+
         binding = ActivityResetBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        mAuth = FirebaseAuth.getInstance();
+
+        clickListeners();
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -31,40 +45,33 @@ public class ResetActivity extends AppCompatActivity {
             return insets;
         });
 
-        clickListeners();
-        mAuth = FirebaseAuth.getInstance();
     }
 
-    //Método para configurar o clique dos botões da atividade
     private void clickListeners() {
-        binding.btnEnviar.setOnClickListener(v -> validarCampos());
+        binding.btnEnviar.setOnClickListener(v -> resetSenha());
     }
 
-    //Método para verificar se o formato do email digitado é valido
     private boolean isEmailValido(String email) {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
-    //Método para validar os campos de email
-    private void validarCampos() {
-        String email = binding.editEmail.getText().toString().trim();
-        if (email.isEmpty()) {
-            mostrarSnackbar(getString(R.string.snack_Vazio));
-        } else if (!isEmailValido(email)) {
-            mostrarSnackbar(getString(R.string.snack_emailInvalido));
-            binding.editEmail.requestFocus();
-        } else {
-            resetSenha();
-        }
-    }
-
-    //Método para realizar o reset de senha no Firebase
     private void resetSenha() {
-        String email = binding.editEmail.getText().toString();
+        final String email = Objects.requireNonNull(binding.editEmail.getText()).toString();
+
+        if (email.isEmpty()) {
+            binding.containerEmail.setError("Por favor preencha este campo");
+            binding.editEmail.requestFocus();
+            return;
+        }
+        if (!isEmailValido(email)){
+            binding.containerEmail.setError("Email inválido ou não cadastrado");
+            binding.editEmail.requestFocus();
+            return;
+        }
 
         mAuth.sendPasswordResetEmail(email).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
-                mostrarSnackbar(getString(R.string.snack_emailEnviado));
+                mostrarSnackbar("O email digitado é inválido. Por favor, digite um email válido.");
                 binding.editEmail.setText("");
             } else {
                 Exception exception = task.getException();
@@ -73,7 +80,6 @@ public class ResetActivity extends AppCompatActivity {
         });
     }
 
-    //Método para exibir uma snackbar ao usuário informando que os campos estão vazios ou inválidos
     private void mostrarSnackbar(String mensagem) {
         Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(getColor(R.color.md_theme_primary))

@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UserActivity">
+    tools:context=".Usuario.UserActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cons_1"
@@ -32,7 +32,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 style="@style/TextAppearance.AppCompat.Headline"
-                android:text="@string/tool_perfil"
+                android:text="Seu perfil"
                 android:textColor="@color/md_theme_primary"
                 android:textStyle="bold"
                 android:layout_gravity="center" />
@@ -84,7 +84,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/user_perfil"
+                android:text="@string/user_nome"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
                 android:textColor="@color/md_theme_primary"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -98,7 +98,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="8dp"
-                android:text="@string/email_perfil"
+                android:text="@string/user_email"
                 android:textColor="@color/md_theme_primary"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -155,7 +155,7 @@
                         android:layout_marginStart="16dp"
                         android:layout_weight="1"
                         android:textColor="@color/md_theme_primary"
-                        android:text="@string/settings_perfil"
+                        android:text="@string/settings_config"
                         android:textAppearance="?attr/textAppearanceBodyLarge" />
 
 

@@ -1,4 +1,4 @@
-package com.example.petcentral;
+package com.example.petcentral.Pets;
 
 
 import android.content.Intent;
@@ -7,7 +7,6 @@ import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -15,29 +14,33 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.petcentral.Adapters.petAdapter;
+import com.example.petcentral.Objetos.Pet;
+import com.example.petcentral.R;
+import com.example.petcentral.Usuario.UserActivity;
 import com.example.petcentral.databinding.ActivityMainBinding;
 import com.google.firebase.auth.FirebaseAuth;
 
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
-
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+
+/**
+ * Esta atividade irá exibir a lista de pets do usuário logado
+ * Permitirá também ele acessar as atividades para cadastrar um
+ * pet ou acessar as configurações do usuário
+ */
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
-    RecyclerView recyclerView;
-    ArrayList<Pet> petArrayList;
-    petAdapter petAdapter;
-    FirebaseAuth mAuth;
-    FirebaseFirestore db;
+    private ArrayList<Pet> petArrayList;
+    private com.example.petcentral.Adapters.petAdapter petAdapter;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,41 +60,35 @@ public class MainActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
-        recyclerView = binding.recyclerView;
+        RecyclerView recyclerView = binding.recyclerView;
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        petArrayList = new ArrayList<Pet>();
-        petAdapter = new petAdapter(this, petArrayList);
+        petArrayList = new ArrayList<>();
+        petAdapter = new petAdapter(this, petArrayList,db);
         recyclerView.setAdapter(petAdapter);
 
-        EventChangeListener();
+        exibirRecycler();
 
     }
 
-    // Método que adiciona um listener que será chamado sempre que houver uma mudança na coleção "Pets" e adiciona os documentos na lista do adaptador
-    private void EventChangeListener() {
-        String userID = mAuth.getCurrentUser().getUid();
-        db.collection("Usuarios").document(userID).collection("Pets").orderBy(FieldPath.documentId(), Query.Direction.DESCENDING)
-                .addSnapshotListener(new EventListener<QuerySnapshot>() {
-                    @Override
-                    public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-
-                        if (error != null) {
-                            Log.e("ERRO FIRESTORE", error.getMessage());
-                            return;
-                        }
-                        for (DocumentChange dc : value.getDocumentChanges()) {
-                            if (dc.getType() == DocumentChange.Type.ADDED) {
-                                petArrayList.add(dc.getDocument().toObject(Pet.class));
-                            }
-                        }
-                        petAdapter.notifyDataSetChanged();
+    private void exibirRecycler() {
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets")
+                .orderBy(FieldPath.documentId(), Query.Direction.ASCENDING)
+                .addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("ERRO FIRESTORE", error.getMessage());
+                        return;
                     }
+                    petArrayList.clear();
+                    for (QueryDocumentSnapshot dc : value) {
+                        Pet pet = dc.toObject(Pet.class);
+                        petArrayList.add(pet);
+                        }
+                    petAdapter.notifyDataSetChanged();
                 });
     }
-
-
 
     private void clickListeners() {
         binding.floatingActionButton.setOnClickListener(v -> startActivity(new Intent(this, CadastroPetActivity.class)));

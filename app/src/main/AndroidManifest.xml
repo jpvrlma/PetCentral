@@ -13,31 +13,31 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
-            android:name=".editUserActivity"
+            android:name=".Usuario.editUserActivity"
             android:exported="false" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".Usuario.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".UserActivity"
+            android:name=".Usuario.UserActivity"
             android:exported="false" />
         <activity
-            android:name=".CadastroPetActivity"
+            android:name=".Pets.CadastroPetActivity"
             android:exported="false" />
         <activity
-            android:name=".ResetActivity"
+            android:name=".Login.ResetActivity"
             android:exported="false" />
         <activity
-            android:name=".CadastroActivity"
+            android:name=".Login.CadastroActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".Login.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".Pets.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".Login.SplashActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

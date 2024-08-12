@@ -1,17 +1,10 @@
-package com.example.petcentral;
-
-import com.google.firebase.Timestamp;
+package com.example.petcentral.Objetos;
 
 public class Usuario {
     private String nome;
     private String email;
 
     public Usuario() {
-    }
-
-    public Usuario(String nome, String email) {
-        this.nome = nome;
-        this.email = email;
     }
 
     public String getNome() {
@@ -30,6 +23,9 @@ public class Usuario {
         this.email = email;
     }
 
-
+    public Usuario(String nome, String email) {
+        this.nome = nome;
+        this.email = email;
+    }
 }
 

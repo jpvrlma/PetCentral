@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/tol_back"
+            android:text="@string/tool_voltar"
             android:textColor="@color/md_theme_primary"
             android:textStyle="bold" />
 
@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="@string/edit_editarseus"
+        android:text="@string/att_foto"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -67,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/edit_foto"
+        android:text="@string/att_perfil"
         android:textColor="@color/md_theme_primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +75,9 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayoutNome"
-        app:endIconMode="clear_text"
+        app:errorEnabled="true"
+        app:counterEnabled="true"
+        app:counterMaxLength="30"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -89,7 +91,7 @@
             android:id="@+id/editTextNome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/nome" />
+            android:hint="@string/hint_nome" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -110,7 +112,7 @@
             android:id="@+id/autoCompleteSexo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/edit_sexo"
+            android:hint="@string/hint_sexo"
             android:inputType="none" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -131,7 +133,7 @@
             android:focusable="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/data_nasc"
+            android:hint="@string/hint_data"
             android:inputType="date" />
 
     </com.google.android.material.textfield.TextInputLayout>
@@ -144,7 +146,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/edit_salvar"
+        android:text="@string/btn_salvar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayoutNascimento" />

@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_constraintVertical_chainStyle="packed"
-    tools:context=".MainActivity">
+    tools:context=".Pets.MainActivity">
 
 
     <TextView
@@ -16,7 +16,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:text="@string/main_msg"
+        android:text="@string/main_saudacao"
         android:textAppearance="?attr/textAppearanceDisplaySmall"
         android:textColor="@color/md_theme_primary"
         app:layout_constraintEnd_toEndOf="parent"
@@ -30,7 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="32dp"
-        android:text="@string/main_pet"
+        android:text="@string/main_seus_pets"
         android:textAppearance="?attr/textAppearanceDisplaySmall"
         android:textColor="@color/md_theme_primary"
         app:layout_constraintEnd_toStartOf="@+id/btn_settings"
