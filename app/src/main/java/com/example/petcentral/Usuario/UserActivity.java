@@ -68,8 +68,7 @@ public class UserActivity extends AppCompatActivity {
     }
 
     private void clickListeners() {
-        binding.btnEdit.setOnClickListener(v-> startActivity(new Intent(this, editUserActivity.class)));
-        binding.cardConfiguracoes.setOnClickListener(v -> startActivity(new Intent(this, SettingsActivity.class)));
+        binding.cardConfiguracoes.setOnClickListener(v -> startActivity(new Intent(this, editUserActivity.class)));
         binding.cardLogout.setOnClickListener(v -> logout());
         }
 

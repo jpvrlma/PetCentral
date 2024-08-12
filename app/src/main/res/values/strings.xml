@@ -22,11 +22,13 @@
     <string name="hint_data">Data de Nascimento</string>
     <string name="user_nome">nome_user</string>
     <string name="user_email">email_user</string>
-    <string name="settings_config">Configurações</string>
+    <string name="settings_config">Editar perfil</string>
     <string name="settings_logout">Sair</string>
     <string name="att_perfil">Atualize seu perfil!</string>
     <string name="att_foto">Carregue sua foto de perfil</string>
     <string name="btn_salvar">Salvar</string>
+    <string name="editar_pet">Editar Pet</string>
+    <string name="editPet_altere">Altere a foto do seu pet!</string>
 
     <!-- Arrays -->
 
