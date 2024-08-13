@@ -21,6 +21,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:id="@+id/btnVoltar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/arrow_back"
@@ -125,6 +126,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="16dp"
             android:text="@string/btn_cadastro"
+            android:textStyle="bold"
             android:textColor="@color/md_theme_onPrimary"
             app:cornerRadius="5dp"
             app:layout_constraintBottom_toTopOf="@+id/progressBar"

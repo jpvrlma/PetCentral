@@ -1,5 +1,6 @@
 package com.example.petcentral.Usuario;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -84,6 +85,9 @@ public class editUserActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
         binding.editTextNascimento.setOnClickListener(v -> startDatePicker());
+        binding.backButton.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));
+
+        binding.editTextNome.setOnClickListener(v -> binding.textInputLayoutNome.setError(null));
     }
 
     private void mostrarSnackbar(String mensagem) {

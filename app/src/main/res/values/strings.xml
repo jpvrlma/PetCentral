@@ -15,11 +15,11 @@
     <string name="cadastro_faca">Faça seu Cadastro!</string>
     <string name="hint_nome">Nome</string>
     <string name="btn_cadastro">Cadastrar</string>
-    <string name="pet_cadastre">Cadastre um pet</string>
+    <string name="pet_cadastre">Cadastrar um pet</string>
     <string name="hint_especie">Espécie</string>
     <string name="hint_raca">Raça</string>
     <string name="hint_sexo">Sexo</string>
-    <string name="hint_data">Data de Nascimento</string>
+    <string name="hint_data">Nascimento</string>
     <string name="user_nome">nome_user</string>
     <string name="user_email">email_user</string>
     <string name="settings_config">Editar perfil</string>

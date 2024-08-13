@@ -11,6 +11,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.petcentral.Login.LoginActivity;
+import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.databinding.ActivityUserBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -70,6 +71,7 @@ public class UserActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.cardConfiguracoes.setOnClickListener(v -> startActivity(new Intent(this, editUserActivity.class)));
         binding.cardLogout.setOnClickListener(v -> logout());
+        binding.btnBack.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
         }
 
         private void logout(){

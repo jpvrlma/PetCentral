@@ -1,5 +1,6 @@
 package com.example.petcentral.Login;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 
@@ -49,6 +50,8 @@ public class ResetActivity extends AppCompatActivity {
 
     private void clickListeners() {
         binding.btnEnviar.setOnClickListener(v -> resetSenha());
+        binding.editEmail.setOnClickListener(v -> binding.containerEmail.setError(null));
+        binding.backButton.setOnClickListener(v -> startActivity(new Intent(this, LoginActivity.class)));
     }
 
     private boolean isEmailValido(String email) {

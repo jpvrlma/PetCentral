@@ -76,8 +76,6 @@ public class CadastroPetActivity extends AppCompatActivity {
         isEspecieSelecionada();
         clickListeners();
 
-
-
         autoCompleteTextViewEspecie.setOnItemClickListener((parent, view, position, id) -> {
             binding.autoCompleteEspecie.setError(null);
             autoCompleteTextViewRaca.setText("",false);
@@ -85,12 +83,12 @@ public class CadastroPetActivity extends AppCompatActivity {
             carregarRaca(autoCompleteTextViewRaca,idEspecieSelecionados.get(position));
         });
 
-
     }
 
     private void clickListeners() {
         binding.btnCadastrar.setOnClickListener(v -> validarCampos());
         binding.editData.setOnClickListener(v -> startDatePicker());
+        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
 
         autoCompleteTextViewEspecie.setOnClickListener(v ->{
             autoCompleteTextViewRaca.setText("",false);
@@ -98,7 +96,6 @@ public class CadastroPetActivity extends AppCompatActivity {
         });
         autoCompleteTextViewRaca.setOnClickListener(v -> binding.menuRaca.setError(null));
         autoCompleteTextViewSexo.setOnClickListener(v -> binding.containerSexo.setError(null));
-
     }
 
     private void validarCampos() {
@@ -129,7 +126,7 @@ public class CadastroPetActivity extends AppCompatActivity {
             return;
         }
         if (dataNascimento.isEmpty()) {
-            binding.editData.setError("Campo obrigatório");
+            binding.containerData.setError("Campo obrigatório");
             return;
         }
         binding.autoCompleteEspecie.setText(especie);
@@ -147,6 +144,7 @@ public class CadastroPetActivity extends AppCompatActivity {
     }
 
     private void startDatePicker() {
+        binding.editData.setError(null);
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())

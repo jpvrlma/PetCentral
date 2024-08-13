@@ -12,10 +12,12 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/btn_voltar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@drawable/arrow_back"
@@ -34,26 +36,25 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/petAvatar"
-        android:src="@drawable/upload"
-        android:tint="@color/md_theme_primary"
-        android:layout_width="180dp"
-        android:layout_height="180dp"
-        android:scaleType="centerCrop"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:layout_marginTop="16dp"
         android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:src="@drawable/fotoupload"
+        android:tint="@color/md_theme_primary"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:layout_constraintVertical_bias="0.0"
-        app:shapeAppearanceOverlay="@style/AvatarShape"
-        app:strokeColor="@color/md_theme_primary"
-        app:strokeWidth="4dp" />
+        />
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/container_nome"
         app:errorEnabled="true"
         style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        app:counterEnabled="true"
+        app:counterMaxLength="30"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
@@ -83,9 +84,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/hint_especie"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/container_nome">
@@ -93,11 +95,10 @@
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/autoCompleteEspecie"
-            android:paddingEnd="48dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            />
+            android:paddingEnd="48dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -107,9 +108,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:hint="@string/hint_raca"
+        app:errorEnabled="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/menu_especie">
@@ -117,11 +119,10 @@
 
         <com.google.android.material.textfield.MaterialAutoCompleteTextView
             android:id="@+id/autoCompleteRaca"
-            android:paddingEnd="48dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            />
+            android:paddingEnd="48dp" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -131,7 +132,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -139,6 +140,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/container_sexo"
+            app:errorEnabled="true"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -158,6 +160,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
+            app:errorEnabled="true"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:id="@+id/container_data"
             android:layout_width="0dp"
@@ -176,28 +179,23 @@
         </com.google.android.material.textfield.TextInputLayout>
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/linearLayout"
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_cadastrar"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_height="60dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_weight="1"
+        android:text="@string/btn_cadastro"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/container_sexo_data">
+        app:layout_constraintTop_toBottomOf="@id/container_sexo_data"
+        app:layout_constraintVertical_bias="0.0" />
 
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btn_cadastrar"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_weight="1"
-            android:text="@string/btn_cadastro" />
-
-    </LinearLayout>
 
     <com.google.android.material.progressindicator.CircularProgressIndicator
         android:id="@+id/progressBar"
@@ -210,7 +208,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintTop_toBottomOf="@+id/btn_cadastrar"
         app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
