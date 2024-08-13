@@ -3,6 +3,7 @@ package com.example.petcentral.Objetos;
 import com.google.firebase.Timestamp;
 
 public class Pet {
+    private String id;
     private String nome;
     private String especie;
     private String raca;
@@ -13,12 +14,21 @@ public class Pet {
 
     }
 
-    public Pet (String nome, String especie, String raca, String sexo, Timestamp dataNascimento){
+    public Pet (String id,String nome, String especie, String raca, String sexo, Timestamp dataNascimento){
+        this.id = id;
         this.nome = nome;
         this.especie = especie;
         this.raca = raca;
         this.sexo = sexo;
         this.dataNascimento = dataNascimento;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getNome() {

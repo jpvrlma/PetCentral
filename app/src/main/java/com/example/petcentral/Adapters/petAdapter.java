@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.example.petcentral.Interfaces.PetInterface;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.RecyclerItemBinding;
@@ -32,17 +33,19 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
     Context context;
     ArrayList<Pet> petArrayList;
     private FirebaseFirestore db;
+    private final PetInterface petInterface;
 
-    public petAdapter(Context context, ArrayList<Pet> petArrayList, FirebaseFirestore db) {
+    public petAdapter(Context context, ArrayList<Pet> petArrayList, FirebaseFirestore db,PetInterface petInterface) {
         this.context = context;
         this.petArrayList = petArrayList;
         db = FirebaseFirestore.getInstance();
+        this.petInterface = petInterface;
     }
 
     @NonNull
     @Override
     public petAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(RecyclerItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false));
+        return new ViewHolder(RecyclerItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false),petInterface);
     }
 
     @Override
@@ -69,9 +72,18 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private final RecyclerItemBinding binding;
-        public ViewHolder(@NonNull RecyclerItemBinding binding) {
+        public ViewHolder(@NonNull RecyclerItemBinding binding,PetInterface petInterface) {
             super(binding.getRoot());
             this.binding = binding;
+
+            binding.btnEditar.setOnClickListener(v -> {
+                if (petInterface != null){
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION){
+                        petInterface.onEditClick(position);
+                    }
+                }
+            });
 
         }
     }

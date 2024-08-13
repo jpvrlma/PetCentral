@@ -56,6 +56,9 @@ public class CadastroActivity extends AppCompatActivity {
 
     private void clickListeners() {
         binding.btncadastrar.setOnClickListener(v -> validarCampos());
+        binding.editNome.setOnClickListener(v -> binding.containerNome.setError(null));
+        binding.editEmail.setOnClickListener(v -> binding.containerEmail.setError(null));
+        binding.editSenha.setOnClickListener(v -> binding.containerSenha.setError(null));
     }
 
     private boolean isEmailValido(String email) {

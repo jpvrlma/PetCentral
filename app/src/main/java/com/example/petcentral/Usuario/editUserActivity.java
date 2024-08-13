@@ -2,6 +2,7 @@ package com.example.petcentral.Usuario;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 
 import androidx.activity.EdgeToEdge;
@@ -55,8 +56,8 @@ public class editUserActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         autoCompleteTextViewSexo = binding.autoCompleteSexo;
+        inicializarAutoCompleteTextViewLocal(autoCompleteTextViewSexo,R.array.GeneroArray);
 
-        listaSexo();
         getUsuario();
         clickListeners();
 
@@ -93,6 +94,7 @@ public class editUserActivity extends AppCompatActivity {
     }
 
     private void getUsuario() {
+        binding.main.setVisibility(View.GONE);
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .get()
                 .addOnCompleteListener(task -> {
@@ -105,7 +107,10 @@ public class editUserActivity extends AppCompatActivity {
                         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
                         String dataFormatada = dateFormat.format(dataNascimento);
+
                         binding.editTextNascimento.setText(dataFormatada);
+
+                        binding.main.setVisibility(View.VISIBLE);
                     }
                 }).addOnFailureListener(e -> Log.e("ERRO FIRESTORE DATA", Objects.requireNonNull(e.getMessage())));
     }
@@ -118,18 +123,9 @@ public class editUserActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> mostrarSnackbar("Algo saiu mal"));
     }
 
-    private void listaSexo() {
-        db.collection("Genero").get().addOnSuccessListener(queryDocumentSnapshots -> {
-            ArrayList<String> lista = new ArrayList<>();
-            for (DocumentSnapshot snapshot : queryDocumentSnapshots.getDocuments()) {
-                lista.add(snapshot.getString("nome"));
-                inicializarAutoComplete(autoCompleteTextViewSexo, lista);
-            }
-        }).addOnFailureListener(e -> mostrarSnackbar("Erro ao carregar"));
-    }
-
-    private void inicializarAutoComplete(MaterialAutoCompleteTextView autoCompleteTextView, List<String> lista) {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, lista);
+    private void inicializarAutoCompleteTextViewLocal(MaterialAutoCompleteTextView autoCompleteTextView, int arrayResourceId) {
+        String[] opcoes = getResources().getStringArray(arrayResourceId);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, opcoes);
         autoCompleteTextView.setAdapter(adapter);
     }
 

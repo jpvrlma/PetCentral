@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import androidx.activity.EdgeToEdge;
@@ -19,11 +20,17 @@ import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -38,7 +45,8 @@ public class CadastroPetActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    MaterialAutoCompleteTextView autoCompleteTextViewEspecie, autoCompleteTextViewRaca, autoCompleteTextViewSexo;
+    private MaterialAutoCompleteTextView autoCompleteTextViewEspecie, autoCompleteTextViewRaca, autoCompleteTextViewSexo;
+    private ArrayList<String> idEspecieSelecionados = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +56,7 @@ public class CadastroPetActivity extends AppCompatActivity {
         binding = ActivityCadastroPetBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        clickListeners();
+
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
@@ -62,24 +70,35 @@ public class CadastroPetActivity extends AppCompatActivity {
         autoCompleteTextViewRaca = binding.autoCompleteRaca;
         autoCompleteTextViewSexo = binding.autoCompleteSexo;
 
-        inicializarAutoCompleteTextView(autoCompleteTextViewEspecie, R.array.EspecieArray);
-        inicializarAutoCompleteTextView(autoCompleteTextViewSexo, R.array.SexoArray);
+
+        inicializarAutoCompleteTextViewLocal(autoCompleteTextViewSexo, R.array.SexoArray);
+        carregarEspecie();
+        isEspecieSelecionada();
+        clickListeners();
+
+
 
         autoCompleteTextViewEspecie.setOnItemClickListener((parent, view, position, id) -> {
             binding.autoCompleteEspecie.setError(null);
-            setAdapter();
+            autoCompleteTextViewRaca.setText("",false);
+            autoCompleteTextViewRaca.setEnabled(true);
+            carregarRaca(autoCompleteTextViewRaca,idEspecieSelecionados.get(position));
         });
-        autoCompleteTextViewRaca.setOnItemClickListener((parent, view, position, id) -> {
-            binding.autoCompleteRaca.setError(null);
-        });
-        autoCompleteTextViewSexo.setOnItemClickListener((parent, view, position, id) -> {
-            binding.autoCompleteSexo.setError(null);
-        });
+
+
     }
 
     private void clickListeners() {
         binding.btnCadastrar.setOnClickListener(v -> validarCampos());
         binding.editData.setOnClickListener(v -> startDatePicker());
+
+        autoCompleteTextViewEspecie.setOnClickListener(v ->{
+            autoCompleteTextViewRaca.setText("",false);
+            binding.menuEspecie.setError(null);
+        });
+        autoCompleteTextViewRaca.setOnClickListener(v -> binding.menuRaca.setError(null));
+        autoCompleteTextViewSexo.setOnClickListener(v -> binding.containerSexo.setError(null));
+
     }
 
     private void validarCampos() {
@@ -94,19 +113,19 @@ public class CadastroPetActivity extends AppCompatActivity {
             return;
         }
         if (nome.isEmpty()) {
-            binding.editNome.setError("Campo obrigatório");
+            binding.containerNome.setError("Campo obrigatório");
             return;
         }
         if (especie.isEmpty()) {
-            binding.autoCompleteEspecie.setError("Campo obrigatório");
+            binding.menuEspecie.setError("Campo obrigatório");
             return;
         }
         if (raca.isEmpty()) {
-            binding.autoCompleteRaca.setError("Campo obrigatório");
+            binding.menuRaca.setError("Campo obrigatório");
             return;
         }
         if (sexo.isEmpty()) {
-            binding.autoCompleteSexo.setError("Campo obrigatório");
+            binding.containerSexo.setError("Campo obrigatório");
             return;
         }
         if (dataNascimento.isEmpty()) {
@@ -141,36 +160,52 @@ public class CadastroPetActivity extends AppCompatActivity {
         materialDatePicker.show(getSupportFragmentManager(), "TAG");
     }
 
-    private void inicializarAutoCompleteTextView(MaterialAutoCompleteTextView autoCompleteTextView, int arrayResourceId) {
+    private void inicializarAutoCompleteTextViewLocal(MaterialAutoCompleteTextView autoCompleteTextView, int arrayResourceId) {
         String[] opcoes = getResources().getStringArray(arrayResourceId);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, opcoes);
         autoCompleteTextView.setAdapter(adapter);
     }
 
-    private void setAdapter() {
-        String itemSelecionado = autoCompleteTextViewEspecie.getText().toString();
-        switch (itemSelecionado) {
-            case "Cachorro":
-                inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.CachorroArray);
-                binding.menuRaca.setHint("Raça");
-                break;
-            case "Gato":
-                inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.GatoArray);
-                binding.menuRaca.setHint("Raça");
-                break;
-            case "Hamster":
-                inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.HamsterArray);
-                binding.menuRaca.setHint("Raça");
-                break;
-            case "Ave":
-                inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.AveArray);
-                binding.menuRaca.setHint("Raça");
-                break;
-            case "Peixe":
-                inicializarAutoCompleteTextView(autoCompleteTextViewRaca, R.array.PeixeArray);
-                binding.menuRaca.setHint("Raça");
-                break;
+    private void inicializarAutoComplete(MaterialAutoCompleteTextView autoCompleteTextView, List<String> lista) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, lista);
+        autoCompleteTextView.setAdapter(adapter);
+    }
+
+    private void isEspecieSelecionada(){
+        if (binding.autoCompleteEspecie.getText().toString().isEmpty()){
+            binding.autoCompleteRaca.setText("Escolha uma especie primeiro!",false);
+            binding.autoCompleteRaca.setEnabled(false);
         }
+    }
+
+    private void carregarEspecie(){
+        db.collection("especies").get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    ArrayList<String> lista = new ArrayList<>();
+                    if (queryDocumentSnapshots != null) {
+                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
+                            String especie = dc.getString("nome");
+                            String idEspecie = dc.getId();
+                            lista.add(especie);
+                            idEspecieSelecionados.add(idEspecie);
+                        }
+                        inicializarAutoComplete(autoCompleteTextViewEspecie,lista);
+                    }
+                });
+    }
+
+    private void carregarRaca(MaterialAutoCompleteTextView autoCompleteTextView, String idEspecie){
+        db.collection("especies").document(idEspecie).collection("racas")
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    ArrayList<String> listaRacas = new ArrayList<>();
+                    if (queryDocumentSnapshots != null){
+                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()){
+                            String raca = dc.getString("nome");
+                            listaRacas.add(raca);
+                        }
+                        inicializarAutoComplete(autoCompleteTextView,listaRacas);
+                    }
+                });
     }
 
     private Timestamp converterParaTimestamp(String dataStr) {
@@ -189,7 +224,14 @@ public class CadastroPetActivity extends AppCompatActivity {
 
     private void salvarFirebase(String nome, String especie, String raca, String sexo, String dataNascimento) {
         Timestamp timestamp = converterParaTimestamp(dataNascimento);
-        Pet pet = new Pet(nome, especie, raca, sexo, timestamp);
+
+        Map<String,Object> pet = new HashMap<>();
+        pet.put("nome",nome);
+        pet.put("especie",especie);
+        pet.put("raca",raca);
+        pet.put("sexo",sexo);
+        pet.put("dataNascimento",timestamp);
+
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid()).collection("pets").add(pet);
         mostrarSnackbar("Pet cadastrado com sucesso!");
         startActivity(new Intent(CadastroPetActivity.this, MainActivity.class));
