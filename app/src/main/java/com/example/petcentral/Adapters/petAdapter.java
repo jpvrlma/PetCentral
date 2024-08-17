@@ -58,7 +58,6 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
 
         if (pet.getDataNascimento() != null){
             Date dataNascimento = pet.getDataNascimento().toDate();
-            System.out.println("data" + dataNascimento);
             int idade = calcularIdade(dataNascimento);
             holder.binding.textIdade.setText("Idade : " + String.valueOf(idade));
         }
@@ -75,6 +74,15 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
         public ViewHolder(@NonNull RecyclerItemBinding binding,PetInterface petInterface) {
             super(binding.getRoot());
             this.binding = binding;
+
+            binding.cardView.setOnClickListener(v ->{
+                if (petInterface != null) {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION) {
+                        petInterface.onClick(position);
+                    }
+                }
+            });
 
             binding.btnEditar.setOnClickListener(v -> {
                 if (petInterface != null){

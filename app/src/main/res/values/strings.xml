@@ -29,6 +29,8 @@
     <string name="btn_salvar">Salvar</string>
     <string name="editar_pet">Editar Pet</string>
     <string name="editPet_altere">Altere a foto do seu pet!</string>
+    <string name="mainpet_seu">Seu pet</string>
+    <string name="vacinas">Vacinas</string>
 
     <!-- Arrays -->
 

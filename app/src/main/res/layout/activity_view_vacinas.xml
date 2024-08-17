@@ -5,7 +5,7 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Pets.MainPetActivity">
+    tools:context=".Vacinas.ViewVacinasActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -27,7 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/mainpet_seu"
+            android:text="@string/vacinas"
             android:textColor="@color/md_theme_primary"
             android:textStyle="bold" />
 
@@ -104,68 +104,15 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horizontalGuideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.26" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card_vacina"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/md_theme_tertiaryContainer"
-        app:cardCornerRadius="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+    <View
+        android:id="@+id/divider"
+        android:layout_width="391dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="?android:attr/listDivider"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/horizontalGuideline"
-        app:strokeWidth="0dp">
+        app:layout_constraintTop_toBottomOf="@+id/pet_info_container" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <TextView
-                android:id="@+id/text_vacinas"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Vacinas"
-                android:textColor="@color/md_theme_onTertiaryContainer"
-                android:textSize="18sp">
-
-            </TextView>
-
-            <ImageView
-                android:id="@+id/vacina_icon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:src="@drawable/siringa"
-                app:tint="@color/md_theme_onTertiaryContainer" />
-
-        </LinearLayout>
-
-    </com.google.android.material.card.MaterialCardView>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

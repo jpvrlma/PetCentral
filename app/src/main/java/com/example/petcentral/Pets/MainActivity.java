@@ -29,6 +29,10 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 /**
  * Esta atividade irá exibir a lista de pets do usuário logado
@@ -98,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         binding.btnSettings.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));
     }
 
+
     @Override
     public void onEditClick(int position) {
         Pet pet = petArrayList.get(position);
@@ -110,6 +115,11 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
 
     @Override
     public void onClick(int position) {
+        Pet pet = petArrayList.get(position);
+        Intent intent = new Intent(this, MainPetActivity.class);
+        String petId = pet.getId();
+        intent.putExtra("petId", petId);
+        startActivity(intent);
 
     }
 }
