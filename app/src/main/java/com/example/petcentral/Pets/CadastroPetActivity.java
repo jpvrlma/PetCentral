@@ -4,9 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
-import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import androidx.activity.EdgeToEdge;
@@ -22,7 +20,6 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -44,9 +41,11 @@ public class CadastroPetActivity extends AppCompatActivity {
     private ActivityCadastroPetBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private String idEspecie,idRaca;
 
     private MaterialAutoCompleteTextView autoCompleteTextViewEspecie, autoCompleteTextViewRaca, autoCompleteTextViewSexo;
-    private ArrayList<String> idEspecieSelecionados = new ArrayList<>();
+    private final ArrayList<String> idEspecieSelecionados = new ArrayList<>();
+    private final ArrayList<String> idRacaSelecionados = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +79,11 @@ public class CadastroPetActivity extends AppCompatActivity {
             binding.autoCompleteEspecie.setError(null);
             autoCompleteTextViewRaca.setText("",false);
             autoCompleteTextViewRaca.setEnabled(true);
-            carregarRaca(autoCompleteTextViewRaca,idEspecieSelecionados.get(position));
+            idEspecie = idEspecieSelecionados.get(position);
+            carregarRaca(autoCompleteTextViewRaca,idEspecie);
+        });
+        autoCompleteTextViewRaca.setOnItemClickListener((parent, view, position, id) -> {
+            idRaca = idRacaSelecionados.get(position);
         });
 
     }
@@ -133,7 +136,7 @@ public class CadastroPetActivity extends AppCompatActivity {
         binding.autoCompleteRaca.setText(raca);
         binding.autoCompleteSexo.setText(sexo);
         binding.editData.setText(dataNascimento);
-        salvarFirebase(nome, especie, raca, sexo, dataNascimento);
+        salvarFirebase(nome, sexo, dataNascimento);
     }
 
     private void mostrarSnackbar(String mensagem) {
@@ -179,29 +182,26 @@ public class CadastroPetActivity extends AppCompatActivity {
     private void carregarEspecie(){
         db.collection("especies").get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    ArrayList<String> lista = new ArrayList<>();
                     if (queryDocumentSnapshots != null) {
                         for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
-                            String especie = dc.getString("nome");
                             String idEspecie = dc.getId();
-                            lista.add(especie);
                             idEspecieSelecionados.add(idEspecie);
                         }
-                        inicializarAutoComplete(autoCompleteTextViewEspecie,lista);
+                        inicializarAutoComplete(autoCompleteTextViewEspecie,idEspecieSelecionados);
                     }
                 });
     }
 
     private void carregarRaca(MaterialAutoCompleteTextView autoCompleteTextView, String idEspecie){
+        idRacaSelecionados.clear();
         db.collection("especies").document(idEspecie).collection("racas")
                 .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    ArrayList<String> listaRacas = new ArrayList<>();
                     if (queryDocumentSnapshots != null){
                         for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()){
-                            String raca = dc.getString("nome");
-                            listaRacas.add(raca);
+                            idRaca = dc.getId();
+                            idRacaSelecionados.add(idRaca);
                         }
-                        inicializarAutoComplete(autoCompleteTextView,listaRacas);
+                        inicializarAutoComplete(autoCompleteTextView,idRacaSelecionados);
                     }
                 });
     }
@@ -220,13 +220,13 @@ public class CadastroPetActivity extends AppCompatActivity {
         }
     }
 
-    private void salvarFirebase(String nome, String especie, String raca, String sexo, String dataNascimento) {
+    private void salvarFirebase(String nome, String sexo, String dataNascimento) {
         Timestamp timestamp = converterParaTimestamp(dataNascimento);
 
         Map<String,Object> pet = new HashMap<>();
         pet.put("nome",nome);
-        pet.put("especie",especie);
-        pet.put("raca",raca);
+        pet.put("especie",idEspecie);
+        pet.put("raca",idRaca);
         pet.put("sexo",sexo);
         pet.put("dataNascimento",timestamp);
 

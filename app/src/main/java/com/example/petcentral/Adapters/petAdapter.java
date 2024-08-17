@@ -53,7 +53,7 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
         Pet pet = petArrayList.get(position);
 
         holder.binding.textNome.setText(pet.getNome());
-        holder.binding.textEspecie.setText(pet.getEspecie());
+        holder.binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
         holder.binding.textRaca.setText(pet.getRaca());
 
         if (pet.getDataNascimento() != null){
