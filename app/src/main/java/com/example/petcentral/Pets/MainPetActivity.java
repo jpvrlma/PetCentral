@@ -19,6 +19,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class MainPetActivity extends AppCompatActivity {
@@ -26,6 +27,7 @@ public class MainPetActivity extends AppCompatActivity {
     private ActivityMainPetBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
+    private String idEspecie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +51,16 @@ public class MainPetActivity extends AppCompatActivity {
     }
 
     private void clickListeners(){
-        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        binding.btnVoltar.setOnClickListener(v -> finish());
         binding.btnEdit.setOnClickListener(v -> onEditClick());
-        binding.cardVacina.setOnClickListener(v -> startActivity(new Intent(this, ViewVacinasActivity.class)) );
+        binding.cardVacina.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ViewVacinasActivity.class);
+            String idPet = getIntent().getStringExtra("petId");
+            intent.putExtra("petId", idPet);
+            intent.putExtra("idEspecie", idEspecie);
+            startActivity(intent);
+        } );
+
     }
     private void onEditClick(){
         String idPet = getIntent().getStringExtra("petId");
@@ -62,14 +71,15 @@ public class MainPetActivity extends AppCompatActivity {
 
     public void carregarDadosPet(){
         String idPet = getIntent().getStringExtra("petId");
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet).get()
+        db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
+                .collection("pets").document(Objects.requireNonNull(idPet)).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         Pet pet = documentSnapshot.toObject(Pet.class);
-                        binding.textNome.setText(pet.getNome());
+                        binding.textNome.setText(Objects.requireNonNull(pet).getNome());
                         binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
                         binding.textRaca.setText(pet.getRaca());
+                        idEspecie = pet.getEspecie();
                         if (pet.getDataNascimento() != null){
                             Date dataNascimento = pet.getDataNascimento().toDate();
                             int idade = calcularIdade(dataNascimento);

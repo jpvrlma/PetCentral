@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -21,7 +22,6 @@ public class ViewVacinasActivity extends AppCompatActivity {
     private ActivityViewVacinasBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,6 +29,7 @@ public class ViewVacinasActivity extends AppCompatActivity {
 
         binding = ActivityViewVacinasBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
 
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -43,6 +44,15 @@ public class ViewVacinasActivity extends AppCompatActivity {
     }
 
     private void clickListeners(){
-        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, MainPetActivity.class)));
+        binding.btnVoltar.setOnClickListener(v -> finish());
+        binding.btnCadastrar.setOnClickListener(v -> {
+            Intent intent = new Intent(this,SelectVacinaActivity.class);
+            String id = getIntent().getStringExtra("petId");
+            String idEspecie = getIntent().getStringExtra("idEspecie");
+            intent.putExtra("petId",id);
+            intent.putExtra("idEspecie",idEspecie);
+            startActivity(intent);
+        });
     }
+
 }

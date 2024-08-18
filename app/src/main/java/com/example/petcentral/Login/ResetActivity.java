@@ -51,7 +51,7 @@ public class ResetActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.btnEnviar.setOnClickListener(v -> resetSenha());
         binding.editEmail.setOnClickListener(v -> binding.containerEmail.setError(null));
-        binding.backButton.setOnClickListener(v -> startActivity(new Intent(this, LoginActivity.class)));
+        binding.backButton.setOnClickListener(v -> finish());
     }
 
     private boolean isEmailValido(String email) {

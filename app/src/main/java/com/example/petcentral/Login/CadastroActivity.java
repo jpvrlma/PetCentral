@@ -57,7 +57,7 @@ public class CadastroActivity extends AppCompatActivity {
 
     private void clickListeners() {
         binding.btncadastrar.setOnClickListener(v -> validarCampos());
-        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, LoginActivity.class)));
+        binding.btnVoltar.setOnClickListener(v -> finish());
         binding.editNome.setOnClickListener(v -> binding.containerNome.setError(null));
         binding.editEmail.setOnClickListener(v -> binding.containerEmail.setError(null));
         binding.editSenha.setOnClickListener(v -> binding.containerSenha.setError(null));

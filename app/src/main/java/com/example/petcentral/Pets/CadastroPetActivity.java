@@ -91,7 +91,7 @@ public class CadastroPetActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.btnCadastrar.setOnClickListener(v -> validarCampos());
         binding.editData.setOnClickListener(v -> startDatePicker());
-        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        binding.btnVoltar.setOnClickListener(v -> finish());
 
         autoCompleteTextViewEspecie.setOnClickListener(v ->{
             autoCompleteTextViewRaca.setText("",false);

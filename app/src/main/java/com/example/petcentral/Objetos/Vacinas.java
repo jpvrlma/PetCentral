@@ -6,15 +6,17 @@ public class Vacinas {
     private String id;
     private Timestamp dataAplicacao;
     private Timestamp proximaDose;
+    private String descricao;
 
     public Vacinas(){
 
     }
 
-    public Vacinas(String id, Timestamp dataAplicacao, Timestamp proximaDose) {
+    public Vacinas(String id, Timestamp dataAplicacao, Timestamp proximaDose, String descricao) {
         this.id = id;
         this.dataAplicacao = dataAplicacao;
         this.proximaDose = proximaDose;
+        this.descricao = descricao;
     }
 
     public String getId() {
@@ -39,5 +41,13 @@ public class Vacinas {
 
     public void setProximaDose(Timestamp proximaDose) {
         this.proximaDose = proximaDose;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 }

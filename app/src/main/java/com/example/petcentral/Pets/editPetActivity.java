@@ -95,7 +95,7 @@ public class editPetActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.editData.setOnClickListener(v -> startDatePicker());
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
-        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        binding.btnVoltar.setOnClickListener(v -> finish());
         binding.btnCancelar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
         binding.btnExcluir.setOnClickListener(v -> {
             db.collection("usuarios").document(mAuth.getCurrentUser().getUid())

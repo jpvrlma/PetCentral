@@ -71,7 +71,7 @@ public class UserActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.cardConfiguracoes.setOnClickListener(v -> startActivity(new Intent(this, editUserActivity.class)));
         binding.cardLogout.setOnClickListener(v -> logout());
-        binding.btnBack.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
+        binding.btnBack.setOnClickListener(v -> finish());
         }
 
         private void logout(){

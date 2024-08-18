@@ -85,7 +85,7 @@ public class editUserActivity extends AppCompatActivity {
     private void clickListeners() {
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
         binding.editTextNascimento.setOnClickListener(v -> startDatePicker());
-        binding.backButton.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));
+        binding.backButton.setOnClickListener(v -> finish());
 
         binding.editTextNome.setOnClickListener(v -> binding.textInputLayoutNome.setError(null));
     }
