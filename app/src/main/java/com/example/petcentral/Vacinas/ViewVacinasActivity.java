@@ -1,5 +1,6 @@
 package com.example.petcentral.Vacinas;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -8,19 +9,40 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.Pets.MainActivity;
+import com.example.petcentral.Pets.MainPetActivity;
 import com.example.petcentral.R;
+import com.example.petcentral.databinding.ActivityViewVacinasBinding;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ViewVacinasActivity extends AppCompatActivity {
+
+    private ActivityViewVacinasBinding binding;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_view_vacinas);
+
+        binding = ActivityViewVacinasBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        clickListeners();
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void clickListeners(){
+        binding.btnVoltar.setOnClickListener(v -> startActivity(new Intent(this, MainPetActivity.class)));
     }
 }

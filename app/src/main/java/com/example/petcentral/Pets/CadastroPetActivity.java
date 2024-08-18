@@ -231,7 +231,6 @@ public class CadastroPetActivity extends AppCompatActivity {
         pet.put("dataNascimento",timestamp);
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid()).collection("pets").add(pet);
-        mostrarSnackbar("Pet cadastrado com sucesso!");
         startActivity(new Intent(CadastroPetActivity.this, MainActivity.class));
     }
 }

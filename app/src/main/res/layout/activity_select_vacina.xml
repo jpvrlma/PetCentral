@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Vacinas.ViewVacinasActivity">
+    tools:context=".Vacinas.SelectVacinaActivity">
+
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -27,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/vacinas"
+            android:text="@string/adicionar_uma_vacina"
             android:textColor="@color/md_theme_primary"
             android:textStyle="bold" />
 
@@ -43,6 +44,7 @@
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:srcCompat="@drawable/paw_solid"
         app:tint="@color/md_theme_primary" />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/pet_info_container"
@@ -104,34 +106,16 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <View
-        android:id="@+id/divider"
-        android:layout_width="391dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="8dp"
-        android:background="?android:attr/listDivider"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pet_info_container" />
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
-            android:id="@+id/extended_fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="16dp"
-            android:text="Adicionar vacina"
-            android:textColor="@color/md_theme_onPrimary"
-            app:backgroundTint="@color/md_theme_primary"
-            app:icon="@drawable/add"
-            app:iconTint="@color/md_theme_onPrimary"
-            tools:layout_editor_absoluteX="135dp"
-            tools:layout_editor_absoluteY="629dp" />
-
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
