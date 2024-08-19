@@ -93,10 +93,7 @@ public class CadastroPetActivity extends AppCompatActivity {
         binding.editData.setOnClickListener(v -> startDatePicker());
         binding.btnVoltar.setOnClickListener(v -> finish());
 
-        autoCompleteTextViewEspecie.setOnClickListener(v ->{
-            autoCompleteTextViewRaca.setText("",false);
-            binding.menuEspecie.setError(null);
-        });
+        binding.editNome.setOnClickListener(v -> binding.containerNome.setError(null));
         autoCompleteTextViewRaca.setOnClickListener(v -> binding.menuRaca.setError(null));
         autoCompleteTextViewSexo.setOnClickListener(v -> binding.containerSexo.setError(null));
     }
@@ -114,10 +111,12 @@ public class CadastroPetActivity extends AppCompatActivity {
         }
         if (nome.isEmpty()) {
             binding.containerNome.setError("Campo obrigatório");
+            binding.editNome.requestFocus();
             return;
         }
         if (especie.isEmpty()) {
             binding.menuEspecie.setError("Campo obrigatório");
+
             return;
         }
         if (raca.isEmpty()) {
@@ -147,7 +146,7 @@ public class CadastroPetActivity extends AppCompatActivity {
     }
 
     private void startDatePicker() {
-        binding.editData.setError(null);
+        binding.containerData.setError(null);
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())

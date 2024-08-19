@@ -131,9 +131,11 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
         Vacinas vacinas = vacinasArrayList.get(position);
         String idVacina = vacinas.getId();
         String idPet = getIntent().getStringExtra("petId");
+        String idEspecie = getIntent().getStringExtra("idEspecie");
         Intent intent = new Intent(this, CadastrarDoseActivity.class);
         intent.putExtra("idVacina",idVacina);
         intent.putExtra("idPet",idPet);
+        intent.putExtra("idEspecie",idEspecie);
         startActivity(intent);
     }
 }

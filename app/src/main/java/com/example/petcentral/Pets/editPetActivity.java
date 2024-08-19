@@ -102,6 +102,7 @@ public class editPetActivity extends AppCompatActivity {
                     .collection("pets").document(petId).delete();
             startActivity(new Intent(this, MainActivity.class));
         });
+
     }
 
     private void carregarEspecie() {
@@ -178,6 +179,7 @@ public class editPetActivity extends AppCompatActivity {
         }
         if (nome.isEmpty()) {
             binding.containerNome.setError("Campo obrigatório");
+            binding.editNome.requestFocus();
             return;
         }
         if (especie.isEmpty()) {
@@ -233,6 +235,7 @@ public class editPetActivity extends AppCompatActivity {
     }
 
     private void startDatePicker() {
+        binding.containerData.setError(null);
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())

@@ -85,22 +85,27 @@ public class CadastroActivity extends AppCompatActivity {
         }
         if (nome.isEmpty()) {
             binding.containerNome.setError("Campo obrigatório");
+            binding.editNome.requestFocus();
             return;
         }
         if (email.isEmpty()) {
             binding.containerEmail.setError("Campo obrigatório");
+            binding.editEmail.requestFocus();
             return;
         }
         if (!isEmailValido(email)) {
             binding.containerEmail.setError("O email digitado é inválido. Por favor, digite um email válido.");
+            binding.editEmail.requestFocus();
             return;
         }
         if (senha.isEmpty()) {
             binding.containerSenha.setError("Campo obrigatório");
+            binding.editSenha.requestFocus();
             return;
         }
         if (senha.length() < 6) {
             binding.containerSenha.setError("Sua senha precisa ter pelo menos 6 caracteres.");
+            binding.editSenha.requestFocus();
             return;
         }
         binding.progressBar.setVisibility(View.VISIBLE);
