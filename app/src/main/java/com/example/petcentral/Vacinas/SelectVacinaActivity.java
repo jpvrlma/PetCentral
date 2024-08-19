@@ -1,10 +1,10 @@
 package com.example.petcentral.Vacinas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -13,19 +13,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petcentral.Adapters.vacinaAdapter;
+import com.example.petcentral.Interfaces.selectVacinaInterface;
+import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
-import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivitySelectVacinaBinding;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Objects;
+import java.util.TimeZone;
 
-public class SelectVacinaActivity extends AppCompatActivity {
+public class SelectVacinaActivity extends AppCompatActivity implements selectVacinaInterface {
 
     private ActivitySelectVacinaBinding binding;
     private FirebaseAuth mAuth;
@@ -33,6 +35,7 @@ public class SelectVacinaActivity extends AppCompatActivity {
     private vacinaAdapter adapter;
     private RecyclerView recyclerView;
     private ArrayList<Vacinas> vacinasArrayList;
+    private String idEspecie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,9 +53,10 @@ public class SelectVacinaActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         vacinasArrayList = new ArrayList<>();
-        adapter = new vacinaAdapter(this,vacinasArrayList);
+        adapter = new vacinaAdapter(this,vacinasArrayList,this);
         recyclerView.setAdapter(adapter);
-
+        carregarDadosPet();
+        clickListeners();
         exibirVacinas();
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
@@ -62,6 +66,47 @@ public class SelectVacinaActivity extends AppCompatActivity {
         });
 
     }
+
+    private void clickListeners(){
+        binding.btnVoltar.setOnClickListener(v -> finish());
+    }
+
+
+    public void carregarDadosPet(){
+        String idPet = getIntent().getStringExtra("petId");
+        db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
+                .collection("pets").document(Objects.requireNonNull(idPet)).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Pet pet = documentSnapshot.toObject(Pet.class);
+                        binding.textNome.setText(Objects.requireNonNull(pet).getNome());
+                        binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
+                        binding.textRaca.setText(pet.getRaca());
+                        idEspecie = pet.getEspecie();
+                        if (pet.getDataNascimento() != null){
+                            Date dataNascimento = pet.getDataNascimento().toDate();
+                            int idade = calcularIdade(dataNascimento);
+                            binding.textIdade.setText("Idade : " + String.valueOf(idade));
+                        }
+                    }
+                });
+    }
+
+    public static int calcularIdade(Date dataNascimento) {
+        Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        dataDeNascimentoCalendar.setTime(dataNascimento);
+
+        Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+
+        int idade = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
+        dataDeNascimentoCalendar.add(Calendar.YEAR, idade);
+        if (dataAtualCalendar.before(dataDeNascimentoCalendar)) {
+            idade--;
+        }
+        return idade;
+    }
+
+
     private void exibirVacinas(){
         String idEspecie = getIntent().getStringExtra("idEspecie");
         System.out.println(idEspecie);
@@ -79,5 +124,16 @@ public class SelectVacinaActivity extends AppCompatActivity {
                     }
                     adapter.notifyDataSetChanged();
                 });
+    }
+
+    @Override
+    public void onSelectClick(int position) {
+        Vacinas vacinas = vacinasArrayList.get(position);
+        String idVacina = vacinas.getId();
+        String idPet = getIntent().getStringExtra("petId");
+        Intent intent = new Intent(this, CadastrarDoseActivity.class);
+        intent.putExtra("idVacina",idVacina);
+        intent.putExtra("idPet",idPet);
+        startActivity(intent);
     }
 }
