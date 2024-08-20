@@ -14,13 +14,16 @@ import com.example.petcentral.databinding.ActivityCadastrarDoseBinding;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -43,6 +46,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
+
         clickListeners();
         carregarInfoDaVacina();
         carregarMarcaAutoComplete();
@@ -108,10 +112,56 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         if (dataAplicacao.isEmpty()){
             binding.InputLayoutDataAplicacao.setError("Campo obrigatório");
         }
-        //TODO salvar no firebase();
+        salvarVacinaFirebase(dataAplicacao);
+        salvarDoseFirebase(dataAplicacao,anotacoes,marca,lote,local,nomeVeterinario);
     }
 
+    private void salvarVacinaFirebase(String dataAplicacao){
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+        Timestamp timestamp = converterParaTimestamp(dataAplicacao);
 
+        HashMap<String,Object> vacina = new HashMap<>();
+        vacina.put("dataAplicacao",timestamp);
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina).set(vacina);
+    }
+
+    private void salvarDoseFirebase(String dataAplicacao,String anotacoes,String marca,String lote,String local,String nomeVeterinario){
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+        Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
+
+        HashMap<String,Object> dose = new HashMap<>();
+        dose.put("dataAplicacao",dataAplicacaoTimestamp);
+        dose.put("anotações",anotacoes);
+        dose.put("marca",marca);
+        dose.put("lote",lote);
+        dose.put("local",local);
+        dose.put("nomeVeterinario",nomeVeterinario);
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses").add(dose);
+
+    }
+
+    private Timestamp converterParaTimestamp(String dataStr) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+            Date parsedDate = dateFormat.parse(dataStr);
+            return new Timestamp(parsedDate);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
     private void mostrarSnackbar(String mensagem) {
         Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(getColor(R.color.md_theme_primary))

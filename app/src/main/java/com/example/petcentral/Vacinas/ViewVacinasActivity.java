@@ -53,7 +53,7 @@ public class ViewVacinasActivity extends AppCompatActivity {
     }
 
     public void carregarDadosPet(){
-        String idPet = getIntent().getStringExtra("petId");
+        String idPet = getIntent().getStringExtra("idPet");
         db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
                 .collection("pets").document(Objects.requireNonNull(idPet)).get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -90,9 +90,9 @@ public class ViewVacinasActivity extends AppCompatActivity {
         binding.btnVoltar.setOnClickListener(v -> finish());
         binding.btnCadastrar.setOnClickListener(v -> {
             Intent intent = new Intent(this,SelectVacinaActivity.class);
-            String id = getIntent().getStringExtra("petId");
+            String idPet = getIntent().getStringExtra("idPet");
             String idEspecie = getIntent().getStringExtra("idEspecie");
-            intent.putExtra("petId",id);
+            intent.putExtra("idPet",idPet);
             intent.putExtra("idEspecie",idEspecie);
             startActivity(intent);
         });

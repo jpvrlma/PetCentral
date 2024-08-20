@@ -73,7 +73,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
 
 
     public void carregarDadosPet(){
-        String idPet = getIntent().getStringExtra("petId");
+        String idPet = getIntent().getStringExtra("idPet");
         db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
                 .collection("pets").document(Objects.requireNonNull(idPet)).get()
                 .addOnSuccessListener(documentSnapshot -> {
@@ -109,7 +109,6 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
 
     private void exibirVacinas(){
         String idEspecie = getIntent().getStringExtra("idEspecie");
-        System.out.println(idEspecie);
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").addSnapshotListener((value, error) -> {
                     if (error != null){
@@ -130,9 +129,11 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
     public void onSelectClick(int position) {
         Vacinas vacinas = vacinasArrayList.get(position);
         String idVacina = vacinas.getId();
-        String idPet = getIntent().getStringExtra("petId");
+        String idPet = getIntent().getStringExtra("idPet");
         String idEspecie = getIntent().getStringExtra("idEspecie");
+
         Intent intent = new Intent(this, CadastrarDoseActivity.class);
+
         intent.putExtra("idVacina",idVacina);
         intent.putExtra("idPet",idPet);
         intent.putExtra("idEspecie",idEspecie);

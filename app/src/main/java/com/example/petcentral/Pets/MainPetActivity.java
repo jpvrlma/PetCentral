@@ -55,22 +55,22 @@ public class MainPetActivity extends AppCompatActivity {
         binding.btnEdit.setOnClickListener(v -> onEditClick());
         binding.cardVacina.setOnClickListener(v -> {
             Intent intent = new Intent(this, ViewVacinasActivity.class);
-            String idPet = getIntent().getStringExtra("petId");
-            intent.putExtra("petId", idPet);
+            String idPet = getIntent().getStringExtra("idPet");
+            intent.putExtra("idPet", idPet);
             intent.putExtra("idEspecie", idEspecie);
             startActivity(intent);
         } );
 
     }
     private void onEditClick(){
-        String idPet = getIntent().getStringExtra("petId");
+        String idPet = getIntent().getStringExtra("idPet");
         Intent intent = new Intent(this, editPetActivity.class);
-        intent.putExtra("petId", idPet);
+        intent.putExtra("idPet", idPet);
         startActivity(intent);
     }
 
     public void carregarDadosPet(){
-        String idPet = getIntent().getStringExtra("petId");
+        String idPet = getIntent().getStringExtra("idPet");
         db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
                 .collection("pets").document(Objects.requireNonNull(idPet)).get()
                 .addOnSuccessListener(documentSnapshot -> {

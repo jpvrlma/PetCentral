@@ -107,8 +107,8 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
     public void onEditClick(int position) {
         Pet pet = petArrayList.get(position);
         Intent intent = new Intent(this, editPetActivity.class);
-        String petId = pet.getId();
-        intent.putExtra("petId", petId);
+        String idPet = pet.getId();
+        intent.putExtra("idPet", idPet);
         startActivity(intent);
 
     }
@@ -117,8 +117,8 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
     public void onClick(int position) {
         Pet pet = petArrayList.get(position);
         Intent intent = new Intent(this, MainPetActivity.class);
-        String petId = pet.getId();
-        intent.putExtra("petId", petId);
+        String idPet = pet.getId();
+        intent.putExtra("idPet", idPet);
         startActivity(intent);
 
     }

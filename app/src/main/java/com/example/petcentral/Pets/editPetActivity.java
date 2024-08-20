@@ -36,7 +36,7 @@ public class editPetActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    private String petId, idEspecie, idRaca;
+    private String idPet, idEspecie, idRaca;
     private MaterialAutoCompleteTextView autoCompleteEspecie, autoCompleteRaca, autoCompleteSexo;
     private final ArrayList<String> idEspecieSelecionados = new ArrayList<>();
     private final ArrayList<String> idRacaSelecionados = new ArrayList<>();
@@ -80,7 +80,7 @@ public class editPetActivity extends AppCompatActivity {
             idRaca = idRacaSelecionados.get(position);
         });
 
-        petId = getIntent().getStringExtra("petId");
+        idPet = getIntent().getStringExtra("idPet");
 
         clickListeners();
         getPet();
@@ -99,7 +99,7 @@ public class editPetActivity extends AppCompatActivity {
         binding.btnCancelar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
         binding.btnExcluir.setOnClickListener(v -> {
             db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                    .collection("pets").document(petId).delete();
+                    .collection("pets").document(idPet).delete();
             startActivity(new Intent(this, MainActivity.class));
         });
 
@@ -136,7 +136,7 @@ public class editPetActivity extends AppCompatActivity {
         binding.main.setVisibility(View.GONE);
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(petId).get()
+                .collection("pets").document(idPet).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot != null) {
                         Pet pet = documentSnapshot.toObject(Pet.class);
@@ -209,7 +209,7 @@ public class editPetActivity extends AppCompatActivity {
     private void updatePet(String nome, String idEspecie, String idRaca, String sexo, String dataNascimento) {
         Timestamp timestamp = converterParaTimestamp(dataNascimento);
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(petId)
+                .collection("pets").document(idPet)
                 .update("nome", nome, "especie", idEspecie, "raca", idRaca, "sexo", sexo, "dataNascimento", timestamp);
     }
 
