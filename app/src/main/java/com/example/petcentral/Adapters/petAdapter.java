@@ -58,8 +58,8 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
 
         if (pet.getDataNascimento() != null){
             Date dataNascimento = pet.getDataNascimento().toDate();
-            int idade = calcularIdade(dataNascimento);
-            holder.binding.textIdade.setText("Idade : " + String.valueOf(idade));
+            String idade = calcularIdadeFormatada(dataNascimento);
+            holder.binding.textIdade.setText(idade);
         }
 
     }
@@ -95,18 +95,28 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
 
         }
     }
-    public static int calcularIdade(Date dataNascimento) {
+    public static String calcularIdadeFormatada(Date dataNascimento) {
         Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         dataDeNascimentoCalendar.setTime(dataNascimento);
-
         Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        int anos = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
+        int meses = dataAtualCalendar.get(Calendar.MONTH) - dataDeNascimentoCalendar.get(Calendar.MONTH);
 
-        int idade = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
-        dataDeNascimentoCalendar.add(Calendar.YEAR, idade);
-        if (dataAtualCalendar.before(dataDeNascimentoCalendar)) {
-            idade--;
+        if (meses < 0) {
+            anos--;
+            meses += 12;
         }
-        return idade;
+        StringBuilder idadeFormatada = new StringBuilder();
+        if (anos > 0) {
+            idadeFormatada.append(anos).append(anos == 1 ? " ano" : " anos");
+        }
+        if (meses > 0) {
+            if (idadeFormatada.length() > 0) {
+                idadeFormatada.append(" e ");
+            }
+            idadeFormatada.append(meses).append(meses == 1 ? " mês" : " meses");
+        }
+        return idadeFormatada.toString();
     }
 
 

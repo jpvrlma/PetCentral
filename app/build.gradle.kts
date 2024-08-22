@@ -48,4 +48,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+
+    implementation("com.github.vipulasri:timelineview:1.1.5")
+
 }

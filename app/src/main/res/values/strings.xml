@@ -38,7 +38,6 @@
     <string-array name="SexoArray">
         <item>Macho</item>
         <item>Fêmea</item>
-        <item>Outro</item>
     </string-array>
 
     <string-array name="GeneroArray">
@@ -47,5 +46,12 @@
         <item>Outro</item>
     </string-array>
 
+    <string-array name="Lembrete">
+        <item>1 dia</item>
+        <item>2 dias</item>
+        <item>3 dias</item>
+        <item>4 dias</item>
+        <item>5 dias</item>
+    </string-array>
 
 </resources>

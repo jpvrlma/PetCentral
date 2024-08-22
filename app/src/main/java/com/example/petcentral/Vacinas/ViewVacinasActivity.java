@@ -29,7 +29,6 @@ public class ViewVacinasActivity extends AppCompatActivity {
     private ActivityViewVacinasBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
-    private String idEspecie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,28 +61,37 @@ public class ViewVacinasActivity extends AppCompatActivity {
                         binding.textNome.setText(Objects.requireNonNull(pet).getNome());
                         binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
                         binding.textRaca.setText(pet.getRaca());
-                        idEspecie = pet.getEspecie();
                         if (pet.getDataNascimento() != null){
                             Date dataNascimento = pet.getDataNascimento().toDate();
-                            int idade = calcularIdade(dataNascimento);
-                            binding.textIdade.setText("Idade : " + String.valueOf(idade));
+                            String idade = calcularIdadeFormatada(dataNascimento);
+                            binding.textIdade.setText(idade);
                         }
                     }
                 });
     }
 
-    public static int calcularIdade(Date dataNascimento) {
+    public static String calcularIdadeFormatada(Date dataNascimento) {
         Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         dataDeNascimentoCalendar.setTime(dataNascimento);
-
         Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        int anos = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
+        int meses = dataAtualCalendar.get(Calendar.MONTH) - dataDeNascimentoCalendar.get(Calendar.MONTH);
 
-        int idade = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
-        dataDeNascimentoCalendar.add(Calendar.YEAR, idade);
-        if (dataAtualCalendar.before(dataDeNascimentoCalendar)) {
-            idade--;
+        if (meses < 0) {
+            anos--;
+            meses += 12;
         }
-        return idade;
+        StringBuilder idadeFormatada = new StringBuilder();
+        if (anos > 0) {
+            idadeFormatada.append(anos).append(anos == 1 ? " ano" : " anos");
+        }
+        if (meses > 0) {
+            if (idadeFormatada.length() > 0) {
+                idadeFormatada.append(" e ");
+            }
+            idadeFormatada.append(meses).append(meses == 1 ? " mês" : " meses");
+        }
+        return idadeFormatada.toString();
     }
 
     private void clickListeners(){
@@ -91,9 +99,7 @@ public class ViewVacinasActivity extends AppCompatActivity {
         binding.btnCadastrar.setOnClickListener(v -> {
             Intent intent = new Intent(this,SelectVacinaActivity.class);
             String idPet = getIntent().getStringExtra("idPet");
-            String idEspecie = getIntent().getStringExtra("idEspecie");
             intent.putExtra("idPet",idPet);
-            intent.putExtra("idEspecie",idEspecie);
             startActivity(intent);
         });
     }

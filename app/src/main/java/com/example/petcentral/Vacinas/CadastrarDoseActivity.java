@@ -19,10 +19,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -120,13 +123,22 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
         Timestamp timestamp = converterParaTimestamp(dataAplicacao);
+        Timestamp proximaDose = calcularProximaDoseMeses(timestamp,12);
 
         HashMap<String,Object> vacina = new HashMap<>();
         vacina.put("dataAplicacao",timestamp);
+        vacina.put("proximaDose",proximaDose);
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
                 .collection("vacinas").document(idVacina).set(vacina);
+    }
+
+    public Timestamp calcularProximaDoseMeses(Timestamp dataAplicacao, int intervaloMeses){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.setTime(dataAplicacao.toDate());
+        calendar.add(Calendar.MONTH,intervaloMeses);
+        return new Timestamp(calendar.getTime());
     }
 
     private void salvarDoseFirebase(String dataAplicacao,String anotacoes,String marca,String lote,String local,String nomeVeterinario){

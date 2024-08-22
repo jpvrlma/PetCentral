@@ -16,7 +16,9 @@ import com.example.petcentral.Adapters.vacinaAdapter;
 import com.example.petcentral.Interfaces.selectVacinaInterface;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
+import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivitySelectVacinaBinding;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -36,6 +38,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
     private RecyclerView recyclerView;
     private ArrayList<Vacinas> vacinasArrayList;
     private String idEspecie;
+    private Long idadePetMili;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +60,6 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
         recyclerView.setAdapter(adapter);
         carregarDadosPet();
         clickListeners();
-        exibirVacinas();
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -83,32 +85,19 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
                         binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
                         binding.textRaca.setText(pet.getRaca());
                         idEspecie = pet.getEspecie();
+                        idadePetMili = pet.getDataNascimento().toDate().getTime();
                         if (pet.getDataNascimento() != null){
                             Date dataNascimento = pet.getDataNascimento().toDate();
-                            int idade = calcularIdade(dataNascimento);
-                            binding.textIdade.setText("Idade : " + String.valueOf(idade));
+                            String idade = calcularIdadeFormatada(dataNascimento);
+                            binding.textIdade.setText(idade);
                         }
+                        exibirVacinas();
                     }
                 });
     }
 
-    public static int calcularIdade(Date dataNascimento) {
-        Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        dataDeNascimentoCalendar.setTime(dataNascimento);
-
-        Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-
-        int idade = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
-        dataDeNascimentoCalendar.add(Calendar.YEAR, idade);
-        if (dataAtualCalendar.before(dataDeNascimentoCalendar)) {
-            idade--;
-        }
-        return idade;
-    }
-
-
     private void exibirVacinas(){
-        String idEspecie = getIntent().getStringExtra("idEspecie");
+        System.out.println(idEspecie);
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").addSnapshotListener((value, error) -> {
                     if (error != null){
@@ -124,19 +113,63 @@ public class SelectVacinaActivity extends AppCompatActivity implements selectVac
                     adapter.notifyDataSetChanged();
                 });
     }
+    public static String calcularIdadeFormatada(Date dataNascimento) {
+        Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        dataDeNascimentoCalendar.setTime(dataNascimento);
+        Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        int anos = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
+        int meses = dataAtualCalendar.get(Calendar.MONTH) - dataDeNascimentoCalendar.get(Calendar.MONTH);
+
+        if (meses < 0) {
+            anos--;
+            meses += 12;
+        }
+        StringBuilder idadeFormatada = new StringBuilder();
+        if (anos > 0) {
+            idadeFormatada.append(anos).append(anos == 1 ? " ano" : " anos");
+        }
+        if (meses > 0) {
+            if (idadeFormatada.length() > 0) {
+                idadeFormatada.append(" e ");
+            }
+            idadeFormatada.append(meses).append(meses == 1 ? " mês" : " meses");
+        }
+        return idadeFormatada.toString();
+    }
+    private void mostrarSnackbar(String mensagem) {
+        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(getColor(R.color.md_theme_primary))
+                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
+                .show();
+    }
 
     @Override
     public void onSelectClick(int position) {
         Vacinas vacinas = vacinasArrayList.get(position);
         String idVacina = vacinas.getId();
         String idPet = getIntent().getStringExtra("idPet");
-        String idEspecie = getIntent().getStringExtra("idEspecie");
+        Date idadePet = new Date(idadePetMili);
 
-        Intent intent = new Intent(this, CadastrarDoseActivity.class);
+        Calendar dataNascimentoCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        dataNascimentoCalendar.setTime(idadePet);
 
-        intent.putExtra("idVacina",idVacina);
-        intent.putExtra("idPet",idPet);
-        intent.putExtra("idEspecie",idEspecie);
-        startActivity(intent);
+        Calendar quatroMesesCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        quatroMesesCalendar.setTime(idadePet);
+        quatroMesesCalendar.add(Calendar.MONTH, 4);
+
+        Calendar hojeCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+
+        if (hojeCalendar.before(quatroMesesCalendar)) {
+            mostrarSnackbar("Seu pet não tem a idade necessária para esta vacina");
+        } else {
+            Intent intent = new Intent(this, CadastrarDoseActivity.class);
+            intent.putExtra("idVacina", idVacina);
+            intent.putExtra("idPet", idPet);
+            intent.putExtra("idEspecie", idEspecie);
+            startActivity(intent);
+        }
     }
+
+
+
 }
