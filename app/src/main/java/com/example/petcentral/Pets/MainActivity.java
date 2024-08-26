@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         });
 
         clickListeners();
+        saudacao();
         db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
 
@@ -71,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         petArrayList = new ArrayList<>();
-        petAdapter = new petAdapter(this, petArrayList,db,this);
+        petAdapter = new petAdapter(this, petArrayList,this);
         recyclerView.setAdapter(petAdapter);
 
         exibirRecycler();
@@ -97,6 +98,18 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
                 });
     }
 
+    private void saudacao(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        int horaAtual = calendar.get(Calendar.HOUR_OF_DAY);
+        
+        if (horaAtual >= 6 && horaAtual <12){
+            binding.textDia.setText("Bom dia!");
+        } else if (horaAtual > 12 && horaAtual <18) {
+            binding.textDia.setText("Boa tarde!");
+        } else {
+            binding.textDia.setText("Boa noite!");
+        }
+    }
     private void clickListeners() {
         binding.floatingActionButton.setOnClickListener(v -> startActivity(new Intent(this, CadastroPetActivity.class)));
         binding.btnSettings.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));

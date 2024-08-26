@@ -2,22 +2,33 @@ package com.example.petcentral.Vacinas;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.petcentral.Adapters.timelineVacinaAdapter;
 import com.example.petcentral.Objetos.Pet;
+import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.Pets.MainPetActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityViewVacinasBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -29,6 +40,9 @@ public class ViewVacinasActivity extends AppCompatActivity {
     private ActivityViewVacinasBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private timelineVacinaAdapter timelineVacinaAdapter;
+    private RecyclerView recyclerView;
+    private ArrayList<Vacinas> vacinasArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +52,21 @@ public class ViewVacinasActivity extends AppCompatActivity {
         binding = ActivityViewVacinasBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-
+        String petID = getIntent().getStringExtra("idPet");
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         carregarDadosPet();
         clickListeners();
+
+        recyclerView = binding.recyclerView;
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        vacinasArrayList = new ArrayList<>();
+        timelineVacinaAdapter = new timelineVacinaAdapter(this,vacinasArrayList);
+        recyclerView.setAdapter(timelineVacinaAdapter);
+
+        exibirRecycler();
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -67,6 +91,26 @@ public class ViewVacinasActivity extends AppCompatActivity {
                             binding.textIdade.setText(idade);
                         }
                     }
+                });
+    }
+
+
+    private void exibirRecycler(){
+        String idPet = getIntent().getStringExtra("idPet");
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").addSnapshotListener((value, error) -> {
+                    if (error != null){
+                        Log.d("Erro firestore",error.getMessage());
+                        return;
+                    }
+                    vacinasArrayList.clear();
+                    for (QueryDocumentSnapshot dc : value){
+                        Vacinas vacinas = dc.toObject(Vacinas.class);
+                        vacinas.setId(dc.getId());
+                        vacinasArrayList.add(vacinas);
+                    }
+                    timelineVacinaAdapter.notifyDataSetChanged();
                 });
     }
 

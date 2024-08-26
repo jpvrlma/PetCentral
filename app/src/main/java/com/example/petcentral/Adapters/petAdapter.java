@@ -32,13 +32,11 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
 
     Context context;
     ArrayList<Pet> petArrayList;
-    private FirebaseFirestore db;
     private final PetInterface petInterface;
 
-    public petAdapter(Context context, ArrayList<Pet> petArrayList, FirebaseFirestore db,PetInterface petInterface) {
+    public petAdapter(Context context, ArrayList<Pet> petArrayList,PetInterface petInterface) {
         this.context = context;
         this.petArrayList = petArrayList;
-        db = FirebaseFirestore.getInstance();
         this.petInterface = petInterface;
     }
 
