@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -98,18 +99,18 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
                 });
     }
 
-    private void saudacao(){
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        int horaAtual = calendar.get(Calendar.HOUR_OF_DAY);
-        
-        if (horaAtual >= 6 && horaAtual <12){
+    private void saudacao() {
+        LocalTime horaAtual = LocalTime.now();
+
+        if (horaAtual.isAfter(LocalTime.of(6, 0)) && horaAtual.isBefore(LocalTime.of(12, 1))) {
             binding.textDia.setText("Bom dia!");
-        } else if (horaAtual > 12 && horaAtual <18) {
+        } else if (horaAtual.isAfter(LocalTime.of(12, 0)) && horaAtual.isBefore(LocalTime.of(18, 1))) {
             binding.textDia.setText("Boa tarde!");
         } else {
             binding.textDia.setText("Boa noite!");
         }
     }
+
     private void clickListeners() {
         binding.floatingActionButton.setOnClickListener(v -> startActivity(new Intent(this, CadastroPetActivity.class)));
         binding.btnSettings.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));

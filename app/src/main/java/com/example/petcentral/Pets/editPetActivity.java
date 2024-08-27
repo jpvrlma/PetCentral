@@ -2,6 +2,7 @@ package com.example.petcentral.Pets;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -15,13 +16,16 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditPetBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -97,11 +101,7 @@ public class editPetActivity extends AppCompatActivity {
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
         binding.btnVoltar.setOnClickListener(v -> finish());
         binding.btnCancelar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
-        binding.btnExcluir.setOnClickListener(v -> {
-            db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                    .collection("pets").document(idPet).delete();
-            startActivity(new Intent(this, MainActivity.class));
-        });
+        binding.btnExcluir.setOnClickListener(v -> deletarPetESubcolecoes());
 
     }
 
@@ -212,6 +212,63 @@ public class editPetActivity extends AppCompatActivity {
                 .collection("pets").document(idPet)
                 .update("nome", nome, "especie", idEspecie, "raca", idRaca, "sexo", sexo, "dataNascimento", timestamp);
     }
+
+    private void deletarPetESubcolecoes() {
+        String idUser = mAuth.getCurrentUser().getUid();
+        db.collection("usuarios").document(idUser)
+                .collection("pets").document(idPet)
+                .collection("vacinas").get().addOnSuccessListener(vacinasSnapshot -> {
+                    if (vacinasSnapshot != null && !vacinasSnapshot.isEmpty()) {
+                        for (DocumentSnapshot dcVac : vacinasSnapshot.getDocuments()) {
+                            String idVacina = dcVac.getId();
+                            deletarDoses(idUser, idPet, idVacina);
+                        }
+                    } else {
+                        deletarPets();
+                    }
+                });
+    }
+
+    private void deletarDoses(String userId, String idPet, String idVacina) {
+        db.collection("usuarios").document(userId)
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses").get().addOnSuccessListener(dosesSnapshot -> {
+                    if (dosesSnapshot != null && !dosesSnapshot.isEmpty()) {
+                        for (DocumentSnapshot dc : dosesSnapshot.getDocuments()) {
+                            dc.getReference().delete();
+                        }
+                    }
+                    deletarVacina(userId, idPet, idVacina);
+                });
+    }
+
+    private void deletarVacina(String userId, String idPet, String idVacina) {
+        db.collection("usuarios").document(userId)
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina).delete().addOnSuccessListener(aVoid -> {
+                    verificarVacinasRestantes(userId, idPet);
+                });
+    }
+
+    private void verificarVacinasRestantes(String userId, String idPet) {
+        db.collection("usuarios").document(userId)
+                .collection("pets").document(idPet)
+                .collection("vacinas").get().addOnSuccessListener(vacinasSnapshot -> {
+                    if (vacinasSnapshot == null || vacinasSnapshot.isEmpty()) {
+                        deletarPets();
+                    }
+                });
+    }
+
+    private void deletarPets() {
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet).delete().addOnSuccessListener(aVoid -> {
+                    startActivity(new Intent(this, MainActivity.class));
+                });
+    }
+
+
 
     private void mostrarSnackbar(String mensagem) {
         Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
