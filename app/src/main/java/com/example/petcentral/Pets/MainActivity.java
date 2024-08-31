@@ -1,9 +1,9 @@
 package com.example.petcentral.Pets;
 
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
@@ -30,10 +30,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.TimeZone;
+
 
 /**
  * Esta atividade irá exibir a lista de pets do usuário logado
@@ -136,4 +133,12 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         startActivity(intent);
 
     }
+
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onBackPressed(){
+
+    }
+
+
 }

@@ -13,6 +13,9 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".Vacinas.ViewDosesActivity"
+            android:exported="false" />
+        <activity
             android:name=".Vacinas.CadastrarDoseActivity"
             android:exported="false" />
         <activity

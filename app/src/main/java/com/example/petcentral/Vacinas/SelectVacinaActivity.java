@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petcentral.Adapters.vacinaAdapter;
-import com.example.petcentral.Interfaces.selectVacinaInterface;
+import com.example.petcentral.Interfaces.OnSelectInterface;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.R;
@@ -29,7 +29,7 @@ import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.TimeZone;
 
-public class SelectVacinaActivity extends AppCompatActivity implements selectVacinaInterface {
+public class SelectVacinaActivity extends AppCompatActivity implements OnSelectInterface {
 
     private ActivitySelectVacinaBinding binding;
     private FirebaseAuth mAuth;

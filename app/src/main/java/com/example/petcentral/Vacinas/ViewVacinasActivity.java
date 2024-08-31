@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petcentral.Adapters.timelineVacinaAdapter;
+import com.example.petcentral.Interfaces.OnSelectInterface;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.Pets.MainActivity;
@@ -35,7 +36,7 @@ import java.util.GregorianCalendar;
 import java.util.Objects;
 import java.util.TimeZone;
 
-public class ViewVacinasActivity extends AppCompatActivity {
+public class ViewVacinasActivity extends AppCompatActivity implements OnSelectInterface {
 
     private ActivityViewVacinasBinding binding;
     private FirebaseAuth mAuth;
@@ -43,6 +44,7 @@ public class ViewVacinasActivity extends AppCompatActivity {
     private timelineVacinaAdapter timelineVacinaAdapter;
     private RecyclerView recyclerView;
     private ArrayList<Vacinas> vacinasArrayList;
+    private String idEspecie;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,6 @@ public class ViewVacinasActivity extends AppCompatActivity {
         binding = ActivityViewVacinasBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        String petID = getIntent().getStringExtra("idPet");
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
         carregarDadosPet();
@@ -63,7 +64,7 @@ public class ViewVacinasActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         vacinasArrayList = new ArrayList<>();
-        timelineVacinaAdapter = new timelineVacinaAdapter(this,vacinasArrayList);
+        timelineVacinaAdapter = new timelineVacinaAdapter(this,vacinasArrayList,this);
         recyclerView.setAdapter(timelineVacinaAdapter);
 
         exibirRecycler();
@@ -83,6 +84,7 @@ public class ViewVacinasActivity extends AppCompatActivity {
                     if (documentSnapshot.exists()) {
                         Pet pet = documentSnapshot.toObject(Pet.class);
                         binding.textNome.setText(Objects.requireNonNull(pet).getNome());
+                        idEspecie = pet.getEspecie();
                         binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
                         binding.textRaca.setText(pet.getRaca());
                         if (pet.getDataNascimento() != null){
@@ -148,4 +150,15 @@ public class ViewVacinasActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onSelectClick(int position) {
+        Intent intent = new Intent(this, ViewDosesActivity.class);
+        String idPet = getIntent().getStringExtra("idPet");
+        Vacinas vacinas = vacinasArrayList.get(position);
+        String idVacina = vacinas.getId();
+        intent.putExtra("idEspecie",idEspecie);
+        intent.putExtra("idPet",idPet);
+        intent.putExtra("idVacina",idVacina);
+        startActivity(intent);
+    }
 }

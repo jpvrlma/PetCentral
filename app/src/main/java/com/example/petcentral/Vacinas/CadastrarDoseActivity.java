@@ -19,13 +19,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
@@ -120,6 +118,8 @@ public class CadastrarDoseActivity extends AppCompatActivity {
 
         salvarVacinaFirebase(dataAplicacaoTimestamp);
         salvarDoseFirebase(dataAplicacaoTimestamp,anotacoes,marca,lote,local,nomeVeterinario);
+        finish();
+
     }
 
     private void salvarVacinaFirebase(Timestamp dataAplicacao){
@@ -141,6 +141,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
         Timestamp proximaDose = calcularProximaDoseMeses(dataAplicacao, 12);
+        int numeroDose = 1;
 
         HashMap<String, Object> dose = new HashMap<>();
         dose.put("dataAplicacao", dataAplicacao);
@@ -149,6 +150,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         dose.put("lote", lote);
         dose.put("local", local);
         dose.put("nomeVeterinario", nomeVeterinario);
+        dose.put("numeroDose", numeroDose);
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
@@ -174,15 +176,17 @@ public class CadastrarDoseActivity extends AppCompatActivity {
             calendar.setTime(dataAplicacao.toDate());
             calendar.add(Calendar.MONTH, (i + 1) * intervaloMeses);
             Timestamp proximaDose = new Timestamp(calendar.getTime());
+            int numeroDose = i + 2;
 
             HashMap<String, Object> dose = new HashMap<>();
             dose.put("dataAplicacao", null);
             dose.put("proximaDose", proximaDose);
-            dose.put("anotações", "");
-            dose.put("marca", "");
-            dose.put("lote", "");
-            dose.put("local", "");
-            dose.put("nomeVeterinario", "");
+            dose.put("anotações",null);
+            dose.put("marca", null);
+            dose.put("lote", null);
+            dose.put("local", null);
+            dose.put("nomeVeterinario", null);
+            dose.put("numeroDose",numeroDose);
 
             String doseId = "Dose " + (i + 2);
             db.collection("usuarios").document(mAuth.getCurrentUser().getUid())

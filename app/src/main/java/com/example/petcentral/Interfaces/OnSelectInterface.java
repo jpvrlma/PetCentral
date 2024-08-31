@@ -1,5 +1,5 @@
 package com.example.petcentral.Interfaces;
 
-public interface selectVacinaInterface {
+public interface OnSelectInterface {
     void onSelectClick(int position);
 }

@@ -5,13 +5,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
+import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditUserBinding;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -76,7 +79,7 @@ public class editUserActivity extends AppCompatActivity {
         if (nome.isEmpty()) {
             binding.textInputLayoutNome.setError("Campo obrigatório");
         } else {
-            binding.autoCompleteSexo.setText(sexo);
+            binding.autoCompleteSexo.setText(sexo,false);
             binding.editTextNascimento.setText(dataNascimento);
             atualizarUsuario(nome, sexo, dataNascimento);
         }
@@ -133,6 +136,8 @@ public class editUserActivity extends AppCompatActivity {
         autoCompleteTextView.setAdapter(adapter);
     }
 
+
+
     private void startDatePicker() {
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
@@ -146,6 +151,8 @@ public class editUserActivity extends AppCompatActivity {
         });
         materialDatePicker.show(getSupportFragmentManager(), "TAG");
     }
+
+
 
     private Timestamp converterParaTimestamp(String dataStr) {
         try {

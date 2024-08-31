@@ -1,5 +1,6 @@
 package com.example.petcentral.Login;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
@@ -107,6 +108,7 @@ public class LoginActivity extends AppCompatActivity {
         mAuth.signInWithEmailAndPassword(email, senha).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
                 binding.progressBar.setVisibility(View.GONE);
+                finish();
                 startActivity(new Intent(this, MainActivity.class));
             } else {
                 binding.progressBar.setVisibility(View.GONE);
@@ -114,5 +116,10 @@ public class LoginActivity extends AppCompatActivity {
                 errosLogin(exception);
             }
         });
+    }
+    @SuppressLint("MissingSuperCall")
+    @Override
+    public void onBackPressed(){
+
     }
 }

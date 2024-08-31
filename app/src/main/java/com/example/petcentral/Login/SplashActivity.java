@@ -29,9 +29,15 @@ public class SplashActivity extends AppCompatActivity {
         Handler handler = new Handler();
 
         if (mAuth.getCurrentUser() != null) {
-            handler.postDelayed(() -> startActivity(new Intent(SplashActivity.this, MainActivity.class)), 2000);
+            handler.postDelayed(() -> {
+                finish();
+                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+            },2000);
         } else {
-            handler.postDelayed(() -> startActivity(new Intent(SplashActivity.this, LoginActivity.class)), 2000);
+            handler.postDelayed(() -> {
+                finish();
+                startActivity(new Intent(SplashActivity.this, LoginActivity.class));
+            } ,2000);
         }
     }
 }

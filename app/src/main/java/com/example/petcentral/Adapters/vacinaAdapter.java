@@ -2,13 +2,12 @@ package com.example.petcentral.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.petcentral.Interfaces.selectVacinaInterface;
+import com.example.petcentral.Interfaces.OnSelectInterface;
 import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.databinding.RecyclerVacinaItemBinding;
 
@@ -18,9 +17,9 @@ public class vacinaAdapter extends RecyclerView.Adapter<vacinaAdapter.ViewHolder
 
     Context context;
     private ArrayList<Vacinas> vacinasArrayList;
-    private final selectVacinaInterface selectInterface;
+    private final OnSelectInterface selectInterface;
 
-    public vacinaAdapter(Context context, ArrayList<Vacinas> vacinasArrayList,selectVacinaInterface selectInterface) {
+    public vacinaAdapter(Context context, ArrayList<Vacinas> vacinasArrayList,OnSelectInterface selectInterface) {
         this.context = context;
         this.vacinasArrayList = vacinasArrayList;
         this.selectInterface = selectInterface;
@@ -46,7 +45,7 @@ public class vacinaAdapter extends RecyclerView.Adapter<vacinaAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
         private final RecyclerVacinaItemBinding binding;
-        public ViewHolder(@NonNull RecyclerVacinaItemBinding binding,selectVacinaInterface selectInterface) {
+        public ViewHolder(@NonNull RecyclerVacinaItemBinding binding,OnSelectInterface selectInterface) {
             super(binding.getRoot());
             this.binding = binding;
 
