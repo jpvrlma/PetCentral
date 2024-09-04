@@ -18,7 +18,6 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.petcentral.Objetos.DoseVacina;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditarDoseBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -27,9 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
-import java.sql.Time;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,30 +72,10 @@ public class EditarDoseActivity extends AppCompatActivity {
         binding.btnVoltar.setOnClickListener(v-> finish());
         binding.btnCancelar.setOnClickListener(v-> finish());
         binding.btnRegistrar.setOnClickListener(v-> validarCampos());
-        binding.btnExcluir.setOnClickListener(v -> mostrarAlertaExclusao());
+        binding.btnExcluir.setOnClickListener(v -> mostrarAlertaParaExclusao());
         binding.editTextDataAplicacao.setOnClickListener(v-> startDatePicker());
     }
 
-    private void pegarUltimaDataEAtualizar(){
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses")
-                .whereEqualTo("aplicada", true)
-                .orderBy("numeroDose", Query.Direction.DESCENDING)
-                .limit(1)
-                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null){
-                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
-                        adaptarDatas(ultimaAplicacao);
-
-                    }
-                });
-    }
     private void carregarMarcaAutoComplete(){
         String idEspecie = getIntent().getStringExtra("idEspecie");
         String idVacina = getIntent().getStringExtra("idVacina");
@@ -116,54 +94,54 @@ public class EditarDoseActivity extends AppCompatActivity {
     }
 
     private void carregarDadosDose(){
-            String idPet = getIntent().getStringExtra("idPet");
-            String idVacina = getIntent().getStringExtra("idVacina");
-            String idDose = getIntent().getStringExtra("idDose");
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+        String idDose = getIntent().getStringExtra("idDose");
 
-            db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                    .collection("pets").document(idPet)
-                    .collection("vacinas").document(idVacina)
-                    .collection("doses").document(idDose).get()
-                    .addOnSuccessListener(documentSnapshot -> {
-                        if (documentSnapshot != null){
-                            DoseVacina doseVacina = documentSnapshot.toObject(DoseVacina.class);
-                            if (doseVacina!= null){
-                                binding.autoCompleteMarca.setText(doseVacina.getMarca(),false);
-                                binding.editTextLote.setText(doseVacina.getLote());
-                                binding.editTextAnotacoes.setText(doseVacina.getAnotacoes());
-                                binding.editTextLocal.setText(doseVacina.getLocal());
-                                binding.editTextNomeVeterinario.setText(doseVacina.getNomeVeterinario());
-                                binding.tvNome.setText(idDose);
-                                numeroDose = doseVacina.getNumeroDose();
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses").document(idDose).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot != null){
+                        DoseVacina doseVacina = documentSnapshot.toObject(DoseVacina.class);
+                        if (doseVacina!= null){
+                            binding.autoCompleteMarca.setText(doseVacina.getMarca(),false);
+                            binding.editTextLote.setText(doseVacina.getLote());
+                            binding.editTextAnotacoes.setText(doseVacina.getAnotacoes());
+                            binding.editTextLocal.setText(doseVacina.getLocal());
+                            binding.editTextNomeVeterinario.setText(doseVacina.getNomeVeterinario());
+                            binding.tvNome.setText(idDose);
+                            numeroDose = doseVacina.getNumeroDose();
 
-                                if (doseVacina.getDataAplicacao() != null){
-                                    Date dataAplicacao = doseVacina.getDataAplicacao().toDate();
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-                                    sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                                    String dataFormatada = sdf.format(dataAplicacao);
-                                    binding.editTextDataAplicacao.setText(dataFormatada);
-                                } else {
-                                    binding.editTextDataAplicacao.setText("");
-                                }
-
-                                if (doseVacina.getNumeroDose() == 1){
-                                    binding.switchAplicado.setVisibility(View.GONE);
-                                    binding.btnExcluir.setVisibility(View.VISIBLE);
-                                } else {
-                                    binding.switchAplicado.setVisibility(View.VISIBLE);
-                                    binding.btnExcluir.setVisibility(View.GONE);
-                                }
-
-                                if (doseVacina.isAplicada() == true){
-                                    binding.switchAplicado.setChecked(true);
-                                } else {
-                                    binding.switchAplicado.setChecked(false);
-                                }
+                            if (doseVacina.getDataAplicacao() != null){
+                                Date dataAplicacao = doseVacina.getDataAplicacao().toDate();
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                String dataFormatada = sdf.format(dataAplicacao);
+                                binding.editTextDataAplicacao.setText(dataFormatada);
                             } else {
-                                mostrarSnackbar("Erro ao carregar dados da dose");
+                                binding.editTextDataAplicacao.setText("");
                             }
+
+                            if (doseVacina.getNumeroDose() == 1){
+                                binding.switchAplicado.setVisibility(View.GONE);
+                                binding.btnExcluir.setVisibility(View.VISIBLE);
+                            } else {
+                                binding.switchAplicado.setVisibility(View.VISIBLE);
+                                binding.btnExcluir.setVisibility(View.GONE);
+                            }
+
+                            if (doseVacina.isAplicada() == true){
+                                binding.switchAplicado.setChecked(true);
+                            } else {
+                                binding.switchAplicado.setChecked(false);
+                            }
+                        } else {
+                            mostrarSnackbar("Erro ao carregar dados da dose");
                         }
-                    });
+                    }
+                });
 
     }
 
@@ -192,8 +170,8 @@ public class EditarDoseActivity extends AppCompatActivity {
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
 
         if (!binding.switchAplicado.isChecked()){
-            limparVacina();
-            pegarUltimaDataEAtualizar();
+            limparCamposVacina();
+            pegarUltimaDataEAtualizarDosesFuturas();
             atualizarVacinaTimeline();
             return;
         }
@@ -203,7 +181,28 @@ public class EditarDoseActivity extends AppCompatActivity {
         verificarSeUltimaDoseEChamarGeracao();
     }
 
-    private void limparVacina(){
+    private void pegarUltimaDataEAtualizarDosesFuturas(){
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses")
+                .whereEqualTo("aplicada", true)
+                .orderBy("numeroDose", Query.Direction.DESCENDING)
+                .limit(1)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null){
+                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
+                        adaptarDatas(ultimaAplicacao);
+
+                    }
+                });
+    }
+
+    private void limparCamposVacina(){
 
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
@@ -317,7 +316,7 @@ public class EditarDoseActivity extends AppCompatActivity {
                 });
     }
 
-    private void mostrarAlertaExclusao() {
+    private void mostrarAlertaParaExclusao() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Confirmação de Exclusão")
                 .setMessage("Você tem certeza de que deseja excluir todas as doses e o registro dessa vacina? Essa ação não pode ser desfeita.")
@@ -408,7 +407,7 @@ public class EditarDoseActivity extends AppCompatActivity {
                         DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
                         Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
                         Timestamp ultimaProximaDose = ultimoDoc.getTimestamp("proximaDose");
-                        atualizarVacina(ultimaAplicacao, ultimaProximaDose);
+                        atualizarVacinaClass(ultimaAplicacao, ultimaProximaDose);
                     } else{
                         mostrarSnackbar("Nenhuma dose aplicada");
                     }
@@ -417,7 +416,7 @@ public class EditarDoseActivity extends AppCompatActivity {
                 });
     }
 
-    private void atualizarVacina(Timestamp dataAplicacao,Timestamp proximaDose){
+    private void atualizarVacinaClass(Timestamp dataAplicacao,Timestamp proximaDose){
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
 
