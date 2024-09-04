@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
                 });
     }
 
-    private void validarCampos(){
+    private void validarCampos() {
         String marca = binding.autoCompleteMarca.getText().toString().trim();
         String lote = binding.editTextLote.getText().toString().trim();
         String dataAplicacao = binding.editTextDataAplicacao.getText().toString().trim();
@@ -100,36 +101,37 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         String local = binding.editTextLocal.getText().toString().trim();
         String nomeVeterinario = binding.editTextNomeVeterinario.getText().toString().trim();
 
-        if (marca.isEmpty() && dataAplicacao.isEmpty()){
-            mostrarSnackbar("Prencha todos os campos obrigatórios");
+        if (marca.isEmpty() && dataAplicacao.isEmpty()) {
+            mostrarSnackbar("Preencha todos os campos obrigatórios");
             binding.InputLayoutMarca.setError("Campo obrigatório");
             binding.InputLayoutDataAplicacao.setError("Campo obrigatório");
             return;
         }
-        if (marca.isEmpty()){
+        if (marca.isEmpty()) {
             binding.InputLayoutMarca.setError("Campo obrigatório");
             return;
         }
-        if (dataAplicacao.isEmpty()){
+        if (dataAplicacao.isEmpty()) {
             binding.InputLayoutDataAplicacao.setError("Campo obrigatório");
         }
 
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
 
         salvarVacinaFirebase(dataAplicacaoTimestamp);
-        salvarDoseFirebase(dataAplicacaoTimestamp,anotacoes,marca,lote,local,nomeVeterinario);
+        salvarDoseFirebase(dataAplicacaoTimestamp, anotacoes, marca, lote, local, nomeVeterinario);
         finish();
-
     }
 
-    private void salvarVacinaFirebase(Timestamp dataAplicacao){
+
+
+    private void salvarVacinaFirebase(Timestamp dataAplicacao) {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
-        Timestamp proximaDose = calcularProximaDoseMeses(dataAplicacao,12);
+        Timestamp proximaDose = calcularProximaDoseMeses(dataAplicacao, 12);
 
-        HashMap<String,Object> vacina = new HashMap<>();
-        vacina.put("dataAplicacao",dataAplicacao);
-        vacina.put("proximaDose",proximaDose);
+        HashMap<String, Object> vacina = new HashMap<>();
+        vacina.put("dataAplicacao", dataAplicacao);
+        vacina.put("proximaDose", proximaDose);
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
@@ -145,19 +147,21 @@ public class CadastrarDoseActivity extends AppCompatActivity {
 
         HashMap<String, Object> dose = new HashMap<>();
         dose.put("dataAplicacao", dataAplicacao);
-        dose.put("anotações", anotacoes);
+        dose.put("proximaDose", proximaDose);
+        dose.put("anotacoes", anotacoes);
         dose.put("marca", marca);
         dose.put("lote", lote);
         dose.put("local", local);
         dose.put("nomeVeterinario", nomeVeterinario);
         dose.put("numeroDose", numeroDose);
+        dose.put("aplicada",true);
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
                 .collection("vacinas").document(idVacina)
                 .collection("doses").document("Dose 1").set(dose);
 
-        gerarDosesFuturas(proximaDose, 11, 12);
+        gerarDosesFuturas(dataAplicacao, 2, 12);
     }
 
     public Timestamp calcularProximaDoseMeses(Timestamp dataAplicacao, int intervaloMeses){
@@ -174,18 +178,19 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         for (int i = 0; i < numeroDeDoses; i++) {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             calendar.setTime(dataAplicacao.toDate());
-            calendar.add(Calendar.MONTH, (i + 1) * intervaloMeses);
+            calendar.add(Calendar.MONTH, (i+1) * intervaloMeses);
             Timestamp proximaDose = new Timestamp(calendar.getTime());
             int numeroDose = i + 2;
 
             HashMap<String, Object> dose = new HashMap<>();
             dose.put("dataAplicacao", null);
             dose.put("proximaDose", proximaDose);
-            dose.put("anotações",null);
+            dose.put("anotacoes",null);
             dose.put("marca", null);
             dose.put("lote", null);
             dose.put("local", null);
             dose.put("nomeVeterinario", null);
+            dose.put("aplicada",false);
             dose.put("numeroDose",numeroDose);
 
             String doseId = "Dose " + (i + 2);
@@ -204,13 +209,17 @@ public class CadastrarDoseActivity extends AppCompatActivity {
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
             Date parsedDate = dateFormat.parse(dataStr);
-            return new Timestamp(parsedDate);
-
+            if (parsedDate != null) {
+                return new Timestamp(parsedDate);
+            } else {
+                return null;
+            }
         } catch (ParseException e) {
             e.printStackTrace();
             return null;
         }
     }
+
     private void mostrarSnackbar(String mensagem) {
         Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(getColor(R.color.md_theme_primary))

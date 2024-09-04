@@ -20,6 +20,7 @@ import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.Pets.MainPetActivity;
+import com.example.petcentral.Pets.editPetActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityViewVacinasBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -144,6 +145,12 @@ public class ViewVacinasActivity extends AppCompatActivity implements OnSelectIn
         binding.btnVoltar.setOnClickListener(v -> finish());
         binding.btnCadastrar.setOnClickListener(v -> {
             Intent intent = new Intent(this,SelectVacinaActivity.class);
+            String idPet = getIntent().getStringExtra("idPet");
+            intent.putExtra("idPet",idPet);
+            startActivity(intent);
+        });
+        binding.btnEdit.setOnClickListener(v -> {
+            Intent intent = new Intent(this, editPetActivity.class);
             String idPet = getIntent().getStringExtra("idPet");
             intent.putExtra("idPet",idPet);
             startActivity(intent);

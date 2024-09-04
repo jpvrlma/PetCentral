@@ -1,5 +1,6 @@
 package com.example.petcentral.Vacinas;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -51,6 +52,8 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
         dosesVacinaAdapter = new dosesVacinaAdapter(this, doseVacinaArrayList,this);
         recyclerView.setAdapter(dosesVacinaAdapter);
 
+
+        clickListeners();
         exbirRecycler();
         exibirDadosVacina();
 
@@ -59,6 +62,10 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+    }
+
+    private void clickListeners(){
+        binding.btnVoltar.setOnClickListener(v -> finish());
     }
 
     private void exbirRecycler() {
@@ -114,6 +121,19 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
 
     @Override
     public void onSelectClick(int position) {
+
+        DoseVacina doseVacina = doseVacinaArrayList.get(position);
+        Intent intent = new Intent(this, EditarDoseActivity.class);
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+        String idEspecie = getIntent().getStringExtra("idEspecie");
+        String idDose = doseVacina.getId();
+
+        intent.putExtra("idPet",idPet);
+        intent.putExtra("idVacina",idVacina);
+        intent.putExtra("idEspecie",idEspecie);
+        intent.putExtra("idDose",idDose);
+        startActivity(intent);
 
     }
 }

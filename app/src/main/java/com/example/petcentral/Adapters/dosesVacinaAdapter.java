@@ -46,7 +46,7 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
             holder.binding.linhaDivisora.setVisibility(View.VISIBLE);
         }
 
-        if (doseVacina.getDataAplicacao() == null){
+        if (doseVacina.isAplicada() == false){
             holder.binding.tvDia.setText(formatarData(doseVacina.getProximaDose()));
             holder.binding.marcador.setImageResource(R.drawable.marker_red);
             holder.binding.linhaDivisora.setBackgroundColor(context.getColor(R.color.md_theme_error));
@@ -57,13 +57,13 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
         }
 
         if (doseVacina.getMarca() == null){
-            holder.binding.tvMarca.setText("Marca não informada");
+            holder.binding.tvMarca.setText("Não Aplicada");
         } else{
             holder.binding.tvMarca.setText(doseVacina.getMarca());
         }
 
         if (doseVacina.getLote() == null){
-            holder.binding.tvLote.setText("Lote não informado");
+            holder.binding.tvLote.setVisibility(View.GONE);
         } else {
             holder.binding.tvLote.setText(doseVacina.getLote());
         }
@@ -80,6 +80,15 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
         public ViewHolder(@NonNull RecyclerDosesBinding binding,OnSelectInterface selectInterface) {
             super(binding.getRoot());
             this.binding = binding;
+
+            binding.cardView.setOnClickListener(v ->{
+                if (selectInterface != null){
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION){
+                        selectInterface.onSelectClick(position);
+                    }
+                }
+            });
         }
     }
 

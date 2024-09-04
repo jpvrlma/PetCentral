@@ -198,9 +198,9 @@ public class editPetActivity extends AppCompatActivity {
             binding.containerData.setError("Campo obrigatório");
             return;
         }
-        binding.autoCompleteEspecie.setText(especie);
-        binding.autoCompleteRaca.setText(raca);
-        binding.autoCompleteSexo.setText(sexo);
+        binding.autoCompleteEspecie.setText(especie,false);
+        binding.autoCompleteRaca.setText(raca,false);
+        binding.autoCompleteSexo.setText(sexo,false);
         binding.editData.setText(dataNascimento);
         updatePet(nome, idEspecie, idRaca, sexo, dataNascimento);
         startActivity(new Intent(this, MainActivity.class));

@@ -8,23 +8,33 @@ public class DoseVacina extends Dose{
     private String lote;
     private String local;
     private String nomeVeterinario;
+    private  boolean aplicada;
 
     public DoseVacina() {
     }
 
-    public DoseVacina(String marca, String lote, String local, String nomeVeterinario) {
-        this.marca = marca;
-        this.lote = lote;
+    public DoseVacina(boolean aplicada, String local, String lote, String marca, String nomeVeterinario) {
+        this.aplicada = aplicada;
         this.local = local;
+        this.lote = lote;
+        this.marca = marca;
         this.nomeVeterinario = nomeVeterinario;
     }
 
-    public String getMarca() {
-        return marca;
+    public boolean isAplicada() {
+        return aplicada;
     }
 
-    public void setMarca(String marca) {
-        this.marca = marca;
+    public void setAplicada(boolean aplicada) {
+        this.aplicada = aplicada;
+    }
+
+    public String getLocal() {
+        return local;
+    }
+
+    public void setLocal(String local) {
+        this.local = local;
     }
 
     public String getLote() {
@@ -35,12 +45,12 @@ public class DoseVacina extends Dose{
         this.lote = lote;
     }
 
-    public String getLocal() {
-        return local;
+    public String getMarca() {
+        return marca;
     }
 
-    public void setLocal(String local) {
-        this.local = local;
+    public void setMarca(String marca) {
+        this.marca = marca;
     }
 
     public String getNomeVeterinario() {
