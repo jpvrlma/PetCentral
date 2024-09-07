@@ -142,7 +142,12 @@ public class ViewVacinasActivity extends AppCompatActivity implements OnSelectIn
     }
 
     private void clickListeners(){
-        binding.btnVoltar.setOnClickListener(v -> finish());
+        binding.btnVoltar.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainPetActivity.class);
+            String idPet = getIntent().getStringExtra("idPet");
+            intent.putExtra("idPet",idPet);
+            startActivity(intent);
+        });
         binding.btnCadastrar.setOnClickListener(v -> {
             Intent intent = new Intent(this,SelectVacinaActivity.class);
             String idPet = getIntent().getStringExtra("idPet");

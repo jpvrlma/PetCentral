@@ -27,6 +27,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 
 
 import java.sql.Time;
@@ -101,12 +102,16 @@ public class EditarDoseActivity extends AppCompatActivity {
                 .collection("vacinas").document(idVacina)
                 .collection("marcas").get().addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots != null) {
+                        ArrayList<String> nomeMarcas = new ArrayList<>();
                         for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
                             String idMarca = dc.getId();
+                            String nome = dc.getString("nome");
                             idMarcaSelecionados.add(idMarca);
+                            nomeMarcas.add(nome);
                         }
+                        inicializarAutoComplete(autoCompleteTextViewMarca, nomeMarcas);
                     }
-                    inicializarAutoComplete(autoCompleteTextViewMarca, idMarcaSelecionados);
+
                 });
     }
 
@@ -186,6 +191,11 @@ public class EditarDoseActivity extends AppCompatActivity {
 
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
 
+        lote = lote.isEmpty() ? null : lote;
+        anotacoes = anotacoes.isEmpty() ? null : anotacoes;
+        local = local.isEmpty() ? null : local;
+        nomeVeterinario = nomeVeterinario.isEmpty() ? null : nomeVeterinario;
+
         //Nao aplicado
         if (!binding.switchAplicado.isChecked()) {
             limparCamposVacina();
@@ -195,7 +205,7 @@ public class EditarDoseActivity extends AppCompatActivity {
             return;
         }
         //Aplicado
-        atualizarDose(marca, lote, dataAplicacao, anotacoes, local, nomeVeterinario);
+        verificarUltimaDoseAplicada(marca, lote, dataAplicacao, anotacoes, local, nomeVeterinario);
         atualizarDosesFuturas(numeroDose, dataAplicacaoTimestamp);
         atualizarVacinaTimeline();
         verificarSeUltimaDoseEChamarGeracao();
@@ -288,6 +298,7 @@ public class EditarDoseActivity extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> {
                                 Intent intent = new Intent(EditarDoseActivity.this, ViewVacinasActivity.class);
                                 intent.putExtra("idPet", idPet);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
                                 finish();
                             });
@@ -486,6 +497,30 @@ public class EditarDoseActivity extends AppCompatActivity {
                         int numeroDoseAtual = ultimoDoc.getLong("numeroDose").intValue();
                         System.out.println(numeroDoseAtual);
                         adaptarDatas(ultimaAplicacao);
+                    }
+                });
+    }
+
+    private void verificarUltimaDoseAplicada(String marca, String lote, String dataAplicacao, String anotacoes, String local, String nomeVeterinario){
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses")
+                .whereEqualTo("aplicada", true)
+                .orderBy("numeroDose", Query.Direction.DESCENDING)
+                .limit(1)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null){
+                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        int numeroDoseAtual = ultimoDoc.getLong("numeroDose").intValue();
+                        if (numeroDoseAtual < numeroDose){
+                            mostrarSnackbar("Cadastre a dose anterior primeiro");
+                        }else {
+                            atualizarDose(marca,lote,dataAplicacao,anotacoes,local,nomeVeterinario);
+                        }
                     }
                 });
     }

@@ -51,7 +51,12 @@ public class MainPetActivity extends AppCompatActivity {
     }
 
     private void clickListeners(){
-        binding.btnVoltar.setOnClickListener(v -> finish());
+        binding.btnVoltar.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            String idPet = getIntent().getStringExtra("idPet");
+            intent.putExtra("idPet", idPet);
+            startActivity(intent);
+        });
         binding.btnEdit.setOnClickListener(v -> onEditClick());
         binding.cardVacina.setOnClickListener(v -> {
             Intent intent = new Intent(this, ViewVacinasActivity.class);

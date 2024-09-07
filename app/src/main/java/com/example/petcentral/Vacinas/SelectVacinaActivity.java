@@ -18,8 +18,10 @@ import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivitySelectVacinaBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import java.util.ArrayList;
@@ -142,12 +144,23 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                 .show();
     }
 
-    @Override
-    public void onSelectClick(int position) {
-        Vacinas vacinas = vacinasArrayList.get(position);
-        String idVacina = vacinas.getId();
-        String idPet = getIntent().getStringExtra("idPet");
-        String nome = vacinas.getNome();
+    private void verificarSeVacinaJaExiste(String idPet, String idVacina, String nomeVacina) {
+        db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        mostrarSnackbar("Esta vacina já foi registrada");
+                    } else {
+                        verificarIdadeParaVacina(idPet, idVacina, nomeVacina);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    mostrarSnackbar("Erro ao verificar a vacina: " + e.getMessage());
+                });
+    }
+    private void verificarIdadeParaVacina(String idPet, String idVacina, String nomeVacina) {
         Date idadePet = new Date(idadePetMili);
 
         Calendar dataNascimentoCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -166,11 +179,20 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
             intent.putExtra("idVacina", idVacina);
             intent.putExtra("idPet", idPet);
             intent.putExtra("idEspecie", idEspecie);
-            intent.putExtra("nome", nome);
+            intent.putExtra("nome", nomeVacina);
             startActivity(intent);
         }
     }
 
+    @Override
+    public void onSelectClick(int position) {
+        Vacinas vacinas = vacinasArrayList.get(position);
+        String idVacina = vacinas.getId();
+        String idPet = getIntent().getStringExtra("idPet");
+        String nome = vacinas.getNome();
 
+        verificarSeVacinaJaExiste(idPet,idVacina,nome);
+
+    }
 
 }

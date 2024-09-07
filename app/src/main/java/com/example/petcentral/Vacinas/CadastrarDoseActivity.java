@@ -92,12 +92,16 @@ public class CadastrarDoseActivity extends AppCompatActivity {
                 .collection("vacinas").document(idVacina)
                 .collection("marcas").get().addOnSuccessListener(queryDocumentSnapshots -> {
                     if (queryDocumentSnapshots != null) {
+                        ArrayList<String> nomeMarcas = new ArrayList<>();
                         for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
                             String idMarca = dc.getId();
+                            String nome = dc.getString("nome");
                             idMarcaSelecionados.add(idMarca);
+                            nomeMarcas.add(nome);
                         }
+                        inicializarAutoComplete(autoCompleteTextViewMarca, nomeMarcas);
                     }
-                    inicializarAutoComplete(autoCompleteTextViewMarca, idMarcaSelecionados);
+
                 });
     }
 
@@ -124,6 +128,10 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         }
 
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
+        lote = lote.isEmpty() ? null : lote;
+        anotacoes = anotacoes.isEmpty() ? null : anotacoes;
+        local = local.isEmpty() ? null : local;
+        nomeVeterinario = nomeVeterinario.isEmpty() ? null : nomeVeterinario;
 
         salvarVacinaFirebase(dataAplicacaoTimestamp);
         salvarDoseFirebase(dataAplicacaoTimestamp, anotacoes, marca, lote, local, nomeVeterinario);

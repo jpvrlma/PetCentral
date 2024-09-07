@@ -40,24 +40,27 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
     public void onBindViewHolder(@NonNull dosesVacinaAdapter.ViewHolder holder, int position) {
         DoseVacina doseVacina = doseVacinaArrayList.get(position);
 
+        //Tirar Linha
         if (position == doseVacinaArrayList.size() - 1){
             holder.binding.linhaDivisora.setVisibility(View.GONE);
         } else {
             holder.binding.linhaDivisora.setVisibility(View.VISIBLE);
         }
-
+        //Altera a cor do marcador e da linha de acordo com a data
         if (doseVacina.isAplicada() == false){
+            holder.binding.tvProxima.setVisibility(View.VISIBLE);
             holder.binding.tvDia.setText(formatarData(doseVacina.getProximaDose()));
             holder.binding.marcador.setImageResource(R.drawable.marker_red);
             holder.binding.linhaDivisora.setBackgroundColor(context.getColor(R.color.md_theme_error));
         } else {
+            holder.binding.tvProxima.setText("Aplicada");
             holder.binding.tvDia.setText(formatarData(doseVacina.getDataAplicacao()));
             holder.binding.marcador.setImageResource(R.drawable.marker_green);
             holder.binding.linhaDivisora.setBackgroundColor(context.getColor(R.color.verde));
         }
 
         if (doseVacina.getMarca() == null){
-            holder.binding.tvMarca.setText("Não Aplicada");
+            holder.binding.tvMarca.setText("Não aplicada");
         } else{
             holder.binding.tvMarca.setText(doseVacina.getMarca());
         }
