@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp;
 
 public class Vacinas {
     private String id;
+    private String nome;
     private Timestamp dataAplicacao;
     private Timestamp proximaDose;
     private String descricao;
@@ -12,11 +13,12 @@ public class Vacinas {
 
     }
 
-    public Vacinas(String id, Timestamp dataAplicacao, Timestamp proximaDose, String descricao) {
+    public Vacinas(String id, Timestamp dataAplicacao, Timestamp proximaDose, String descricao,String nome) {
         this.id = id;
         this.dataAplicacao = dataAplicacao;
         this.proximaDose = proximaDose;
         this.descricao = descricao;
+        this.nome = nome;
     }
 
     public String getId() {
@@ -49,5 +51,13 @@ public class Vacinas {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 }

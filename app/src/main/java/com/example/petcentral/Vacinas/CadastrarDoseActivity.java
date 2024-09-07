@@ -1,6 +1,8 @@
 package com.example.petcentral.Vacinas;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 
 import androidx.activity.EdgeToEdge;
@@ -9,6 +11,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityCadastrarDoseBinding;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -36,6 +39,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private MaterialAutoCompleteTextView autoCompleteTextViewMarca;
     private final ArrayList<String> idMarcaSelecionados = new ArrayList<>();
+    private ArrayList<Long> intervaloDias = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,35 +65,39 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         });
     }
 
-    private void carregarInfoDaVacina(){
+
+    private void carregarInfoDaVacina() {
         String idVacina = getIntent().getStringExtra("idVacina");
         String idEspecie = getIntent().getStringExtra("idEspecie");
 
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").document(idVacina)
                 .get().addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot != null){
+                    if (documentSnapshot != null) {
                         String resumo = documentSnapshot.getString("resumo");
-                        binding.tvNome.setText(idVacina);
+                        intervaloDias = (ArrayList<Long>) documentSnapshot.get("intervalos");
+                        String nome = documentSnapshot.getString("nome");
+                        binding.tvNome.setText(nome);
                         binding.tvResumo.setText(resumo);
+
                     }
                 });
     }
 
-    private void carregarMarcaAutoComplete(){
+    private void carregarMarcaAutoComplete() {
         String idEspecie = getIntent().getStringExtra("idEspecie");
         String idVacina = getIntent().getStringExtra("idVacina");
 
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").document(idVacina)
                 .collection("marcas").get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null){
-                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()){
+                    if (queryDocumentSnapshots != null) {
+                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
                             String idMarca = dc.getId();
                             idMarcaSelecionados.add(idMarca);
                         }
                     }
-                    inicializarAutoComplete(autoCompleteTextViewMarca,idMarcaSelecionados);
+                    inicializarAutoComplete(autoCompleteTextViewMarca, idMarcaSelecionados);
                 });
     }
 
@@ -119,88 +127,106 @@ public class CadastrarDoseActivity extends AppCompatActivity {
 
         salvarVacinaFirebase(dataAplicacaoTimestamp);
         salvarDoseFirebase(dataAplicacaoTimestamp, anotacoes, marca, lote, local, nomeVeterinario);
-        finish();
     }
-
 
 
     private void salvarVacinaFirebase(Timestamp dataAplicacao) {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
-        Timestamp proximaDose = calcularProximaDoseMeses(dataAplicacao, 12);
+        String nome = getIntent().getStringExtra("nome");
 
-        HashMap<String, Object> vacina = new HashMap<>();
-        vacina.put("dataAplicacao", dataAplicacao);
-        vacina.put("proximaDose", proximaDose);
+        if (intervaloDias != null && !intervaloDias.isEmpty()) {
+            Long primeiroIntervalo = intervaloDias.get(0);
+            Timestamp proximaDose = calcularProximaDoseDias(dataAplicacao, primeiroIntervalo);
 
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina).set(vacina);
+            HashMap<String, Object> vacina = new HashMap<>();
+            vacina.put("dataAplicacao", dataAplicacao);
+            vacina.put("proximaDose", proximaDose);
+            vacina.put("nome",nome);
+
+            db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                    .collection("pets").document(idPet)
+                    .collection("vacinas").document(idVacina).set(vacina);
+        }
     }
 
 
     private void salvarDoseFirebase(Timestamp dataAplicacao, String anotacoes, String marca, String lote, String local, String nomeVeterinario) {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
-        Timestamp proximaDose = calcularProximaDoseMeses(dataAplicacao, 12);
-        int numeroDose = 1;
 
-        HashMap<String, Object> dose = new HashMap<>();
-        dose.put("dataAplicacao", dataAplicacao);
-        dose.put("proximaDose", proximaDose);
-        dose.put("anotacoes", anotacoes);
-        dose.put("marca", marca);
-        dose.put("lote", lote);
-        dose.put("local", local);
-        dose.put("nomeVeterinario", nomeVeterinario);
-        dose.put("numeroDose", numeroDose);
-        dose.put("aplicada",true);
+        if (intervaloDias != null && !intervaloDias.isEmpty()) {
+            Long primeiroIntervalo = intervaloDias.get(0);
+            Timestamp proximaDose = calcularProximaDoseDias(dataAplicacao, primeiroIntervalo);
+            int numeroDose = 1;
 
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses").document("Dose 1").set(dose);
+            HashMap<String, Object> dose = new HashMap<>();
+            dose.put("dataAplicacao", dataAplicacao);
+            dose.put("proximaDose", proximaDose);
+            dose.put("anotacoes", anotacoes);
+            dose.put("marca", marca);
+            dose.put("lote", lote);
+            dose.put("local", local);
+            dose.put("nomeVeterinario", nomeVeterinario);
+            dose.put("numeroDose", numeroDose);
+            dose.put("aplicada", true);
 
-        gerarDosesFuturas(dataAplicacao, 2, 12);
+            db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                    .collection("pets").document(idPet)
+                    .collection("vacinas").document(idVacina)
+                    .collection("doses").document("Dose 1").set(dose)
+                    .addOnSuccessListener(aVoid -> {
+                        gerarDosesFuturas(dataAplicacao, new ArrayList<>(intervaloDias.subList(1, intervaloDias.size())));
+                        Intent intent = new Intent(this, ViewVacinasActivity.class);
+                        intent.putExtra("idPet", idPet);
+                        startActivity(intent);
+                        finish();
+                    }).addOnFailureListener(e -> {
+                        Log.e("CadastrarDoseActivity", "Erro ao salvar a dose: ", e);
+                        mostrarSnackbar("Erro ao salvar a dose");
+                    });
+        }
     }
 
-    public Timestamp calcularProximaDoseMeses(Timestamp dataAplicacao, int intervaloMeses){
+    public Timestamp calcularProximaDoseDias(Timestamp dataAplicacao, long intervaloDias) {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.setTime(dataAplicacao.toDate());
-        calendar.add(Calendar.MONTH,intervaloMeses);
+        calendar.add(Calendar.DAY_OF_YEAR, (int) intervaloDias);
         return new Timestamp(calendar.getTime());
     }
 
-    private void gerarDosesFuturas(Timestamp dataAplicacao, int numeroDeDoses, int intervaloMeses) {
+    private void gerarDosesFuturas(Timestamp dataAplicacao, ArrayList<Long> intervaloDias) {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
 
-        for (int i = 0; i < numeroDeDoses; i++) {
+        for (int i = 0; i < intervaloDias.size(); i++) {
             Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
             calendar.setTime(dataAplicacao.toDate());
-            calendar.add(Calendar.MONTH, (i+1) * intervaloMeses);
+            calendar.add(Calendar.DAY_OF_YEAR, intervaloDias.get(i).intValue());
             Timestamp proximaDose = new Timestamp(calendar.getTime());
             int numeroDose = i + 2;
 
             HashMap<String, Object> dose = new HashMap<>();
             dose.put("dataAplicacao", null);
             dose.put("proximaDose", proximaDose);
-            dose.put("anotacoes",null);
+            dose.put("anotacoes", null);
             dose.put("marca", null);
             dose.put("lote", null);
             dose.put("local", null);
             dose.put("nomeVeterinario", null);
-            dose.put("aplicada",false);
-            dose.put("numeroDose",numeroDose);
+            dose.put("aplicada", false);
+            dose.put("numeroDose", numeroDose);
 
             String doseId = "Dose " + (i + 2);
             db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                     .collection("pets").document(idPet)
                     .collection("vacinas").document(idVacina)
                     .collection("doses").document(doseId).set(dose);
-        }
-    }
 
+            dataAplicacao = proximaDose;
+        }
+
+    }
 
 
     private Timestamp converterParaTimestamp(String dataStr) {

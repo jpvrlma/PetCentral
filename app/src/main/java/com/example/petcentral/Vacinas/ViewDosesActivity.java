@@ -108,9 +108,9 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
                 .collection("vacinas").document(idVacina).get()
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot != null){
-                        String id = documentSnapshot.getId();
+                        String nome = documentSnapshot.getString("nome");
                         String resumo = documentSnapshot.getString("resumo");
-                        binding.nomeVac.setText(id);
+                        binding.nomeVac.setText(nome);
                         binding.tvResumo.setText(resumo);
 
                     }

@@ -34,7 +34,7 @@ public class vacinaAdapter extends RecyclerView.Adapter<vacinaAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull vacinaAdapter.ViewHolder holder, int position) {
             Vacinas vacinas = vacinasArrayList.get(position);
-            holder.binding.tvNome.setText(vacinas.getId());
+            holder.binding.tvNome.setText(vacinas.getNome());
             holder.binding.tvDesc.setText(vacinas.getDescricao());
     }
 

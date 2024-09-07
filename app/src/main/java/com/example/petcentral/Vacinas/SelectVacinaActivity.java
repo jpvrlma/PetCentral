@@ -97,7 +97,6 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
     }
 
     private void exibirVacinas(){
-        System.out.println(idEspecie);
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").addSnapshotListener((value, error) -> {
                     if (error != null){
@@ -148,6 +147,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
         Vacinas vacinas = vacinasArrayList.get(position);
         String idVacina = vacinas.getId();
         String idPet = getIntent().getStringExtra("idPet");
+        String nome = vacinas.getNome();
         Date idadePet = new Date(idadePetMili);
 
         Calendar dataNascimentoCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
@@ -166,6 +166,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
             intent.putExtra("idVacina", idVacina);
             intent.putExtra("idPet", idPet);
             intent.putExtra("idEspecie", idEspecie);
+            intent.putExtra("nome", nome);
             startActivity(intent);
         }
     }

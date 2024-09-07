@@ -47,10 +47,20 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
     public void onBindViewHolder(@NonNull timelineVacinaAdapter.ViewHolder holder, int position) {
         Vacinas vacinas = vacinasArrayList.get(position);
 
-        holder.binding.tvNome.setText(vacinas.getId());
-        holder.binding.tvDataDoseAtual.setText(formatarData(vacinas.getDataAplicacao()));
-        holder.binding.tvDataProximaDose.setText(formatarData(vacinas.getProximaDose()));
-        carregarStatus(vacinas.getProximaDose().toDate(),holder);
+        holder.binding.tvNome.setText(vacinas.getNome());
+
+        if (vacinas.getDataAplicacao() != null) {
+            holder.binding.tvDataDoseAtual.setText(formatarData(vacinas.getDataAplicacao()));
+        } else {
+            holder.binding.tvDataDoseAtual.setText("Data não disponível");
+        }
+
+        if (vacinas.getProximaDose() != null) {
+            holder.binding.tvDataProximaDose.setText(formatarData(vacinas.getProximaDose()));
+            carregarStatus(vacinas.getProximaDose().toDate(), holder);
+        } else {
+            holder.binding.tvDataProximaDose.setText("Data não disponível");
+        }
     }
 
     @Override
@@ -87,7 +97,6 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
         Calendar calendarAtual = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         Date dataAtual = calendarAtual.getTime();
 
-        System.out.println("Data Atual (UTC): " + dataAtual);
 
         if (dataAtual.before(proximaDose)) {
             holder.binding.tvStatus.setText("Status: Em dia");
