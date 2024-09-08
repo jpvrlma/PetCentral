@@ -16,15 +16,16 @@ import com.example.petcentral.Adapters.dosesVacinaAdapter;
 import com.example.petcentral.Interfaces.OnSelectInterface;
 import com.example.petcentral.Objetos.DoseVacina;
 import com.example.petcentral.databinding.ActivityViewDosesBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
+/**
+ * ESTA ATIVIDADE VAI EXIBIR AS DOSES DA VACINA SELECIONADA PELO USUARIO
+ */
 public class ViewDosesActivity extends AppCompatActivity implements OnSelectInterface {
 
     private ActivityViewDosesBinding binding;
@@ -49,12 +50,12 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        dosesVacinaAdapter = new dosesVacinaAdapter(this, doseVacinaArrayList,this);
+        dosesVacinaAdapter = new dosesVacinaAdapter(this, doseVacinaArrayList, this);
         recyclerView.setAdapter(dosesVacinaAdapter);
 
 
         clickListeners();
-        exbirRecycler();
+        exibirRecycler();
         exibirDadosVacina();
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
@@ -64,18 +65,31 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
         });
     }
 
-    private void clickListeners(){
+    // Cliques
+    private void clickListeners() {
         binding.btnVoltar.setOnClickListener(v -> finish());
     }
 
-    private void exbirRecycler() {
+    // ------------------------ CARREGAMENTOS ------------------------
+    private void exibirDadosVacina() {
+        String idVacina = getIntent().getStringExtra("idVacina");
+        String idEspecie = getIntent().getStringExtra("idEspecie");
+        db.collection("especies").document(idEspecie)
+                .collection("vacinas").document(idVacina).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot != null) {
+                        String nome = documentSnapshot.getString("nome");
+                        String resumo = documentSnapshot.getString("resumo");
+                        binding.nomeVac.setText(nome);
+                        binding.tvResumo.setText(resumo);
+                    }
+                });
+    }
+
+    // RECYCLER VIEW DE DOSES DA VACINA SELECIONADA CADASTRADAS NO FIREBASE
+    private void exibirRecycler() {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
-
-        if (idPet == null || idVacina == null) {
-            Log.e("ERRO", "idPet ou idVacina é nulo. Verifique o Intent.");
-            return;
-        }
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
@@ -101,24 +115,7 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
                 });
     }
 
-    private void exibirDadosVacina(){
-        String idVacina = getIntent().getStringExtra("idVacina");
-        String idEspecie = getIntent().getStringExtra("idEspecie");
-        db.collection("especies").document(idEspecie)
-                .collection("vacinas").document(idVacina).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot != null){
-                        String nome = documentSnapshot.getString("nome");
-                        String resumo = documentSnapshot.getString("resumo");
-                        binding.nomeVac.setText(nome);
-                        binding.tvResumo.setText(resumo);
-
-                    }
-                });
-    }
-
-
-
+    // Métodos da interface
     @Override
     public void onSelectClick(int position) {
 
@@ -129,10 +126,10 @@ public class ViewDosesActivity extends AppCompatActivity implements OnSelectInte
         String idEspecie = getIntent().getStringExtra("idEspecie");
         String idDose = doseVacina.getId();
 
-        intent.putExtra("idPet",idPet);
-        intent.putExtra("idVacina",idVacina);
-        intent.putExtra("idEspecie",idEspecie);
-        intent.putExtra("idDose",idDose);
+        intent.putExtra("idPet", idPet);
+        intent.putExtra("idVacina", idVacina);
+        intent.putExtra("idEspecie", idEspecie);
+        intent.putExtra("idDose", idDose);
         startActivity(intent);
 
     }

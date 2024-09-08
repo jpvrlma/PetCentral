@@ -9,11 +9,11 @@ public class Vacinas {
     private Timestamp proximaDose;
     private String descricao;
 
-    public Vacinas(){
+    public Vacinas() {
 
     }
 
-    public Vacinas(String id, Timestamp dataAplicacao, Timestamp proximaDose, String descricao,String nome) {
+    public Vacinas(String id, Timestamp dataAplicacao, Timestamp proximaDose, String descricao, String nome) {
         this.id = id;
         this.dataAplicacao = dataAplicacao;
         this.proximaDose = proximaDose;

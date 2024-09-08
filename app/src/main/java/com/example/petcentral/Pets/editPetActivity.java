@@ -2,7 +2,6 @@ package com.example.petcentral.Pets;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
@@ -16,16 +15,13 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditPetBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,7 +59,6 @@ public class editPetActivity extends AppCompatActivity {
         inicializarAutoCompleteTextViewLocal(autoCompleteSexo, R.array.SexoArray);
         carregarEspecie();
 
-
         autoCompleteSexo.setOnItemClickListener((parent, view, position, id) -> binding.autoCompleteSexo.setError(null));
 
         autoCompleteEspecie.setOnClickListener(v -> {
@@ -96,15 +91,17 @@ public class editPetActivity extends AppCompatActivity {
         });
     }
 
+    //Cliques
     private void clickListeners() {
         binding.editData.setOnClickListener(v -> startDatePicker());
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
         binding.btnVoltar.setOnClickListener(v -> finish());
         binding.btnCancelar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
-        binding.btnExcluir.setOnClickListener(v -> deletarPetESubcolecoes());
+        binding.btnExcluir.setOnClickListener(v -> verificarVacinasDoPetAntesDeDeletar());
 
     }
 
+    // -------------------- Carregamento de menus -----------------------
     private void carregarEspecie() {
         db.collection("especies").get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -132,6 +129,7 @@ public class editPetActivity extends AppCompatActivity {
                 });
     }
 
+    //----------------- Carregar dados do pet -------------------
     private void getPet() {
         binding.main.setVisibility(View.GONE);
 
@@ -166,6 +164,7 @@ public class editPetActivity extends AppCompatActivity {
                 });
     }
 
+    //--------------------- Metodos para update de pet ---------------------
     private void validarCampos() {
         String nome = binding.editNome.getText().toString().trim();
         String especie = binding.autoCompleteEspecie.getText().toString().trim();
@@ -174,7 +173,7 @@ public class editPetActivity extends AppCompatActivity {
         String dataNascimento = binding.editData.getText().toString().trim();
 
         if (nome.isEmpty() && especie.isEmpty() && raca.isEmpty() && sexo.isEmpty() && dataNascimento.isEmpty()) {
-            mostrarSnackbar("Campos obrigatórios estão vazios. Por favor, preencha todos os campos para continuar.");
+            mostrarSnackbar();
             return;
         }
         if (nome.isEmpty()) {
@@ -198,9 +197,9 @@ public class editPetActivity extends AppCompatActivity {
             binding.containerData.setError("Campo obrigatório");
             return;
         }
-        binding.autoCompleteEspecie.setText(especie,false);
-        binding.autoCompleteRaca.setText(raca,false);
-        binding.autoCompleteSexo.setText(sexo,false);
+        binding.autoCompleteEspecie.setText(especie, false);
+        binding.autoCompleteRaca.setText(raca, false);
+        binding.autoCompleteSexo.setText(sexo, false);
         binding.editData.setText(dataNascimento);
         updatePet(nome, idEspecie, idRaca, sexo, dataNascimento);
         startActivity(new Intent(this, MainActivity.class));
@@ -213,65 +212,64 @@ public class editPetActivity extends AppCompatActivity {
                 .update("nome", nome, "especie", idEspecie, "raca", idRaca, "sexo", sexo, "dataNascimento", timestamp);
     }
 
-    private void deletarPetESubcolecoes() {
-        String idUser = mAuth.getCurrentUser().getUid();
-        db.collection("usuarios").document(idUser)
+    // ------------- Metodos de exclusao de pets,vacinas e doses -----------------
+    private void verificarVacinasDoPetAntesDeDeletar() {
+        String idUsuario = mAuth.getCurrentUser().getUid();
+        db.collection("usuarios").document(idUsuario)
                 .collection("pets").document(idPet)
                 .collection("vacinas").get().addOnSuccessListener(vacinasSnapshot -> {
                     if (vacinasSnapshot != null && !vacinasSnapshot.isEmpty()) {
-                        for (DocumentSnapshot dcVac : vacinasSnapshot.getDocuments()) {
-                            String idVacina = dcVac.getId();
-                            deletarDoses(idUser, idPet, idVacina);
+                        // Se o pet tem vacinas, verificar se há doses
+                        for (DocumentSnapshot vacinaDoc : vacinasSnapshot.getDocuments()) {
+                            String idVacina = vacinaDoc.getId();
+                            deletarDosesDaVacina(idUsuario, idPet, idVacina);
                         }
                     } else {
-                        deletarPets();
+                        deletarPet();
                     }
                 });
     }
 
-    private void deletarDoses(String userId, String idPet, String idVacina) {
-        db.collection("usuarios").document(userId)
+    private void deletarDosesDaVacina(String idUsuario, String idPet, String idVacina) {
+        db.collection("usuarios").document(idUsuario)
                 .collection("pets").document(idPet)
                 .collection("vacinas").document(idVacina)
                 .collection("doses").get().addOnSuccessListener(dosesSnapshot -> {
                     if (dosesSnapshot != null && !dosesSnapshot.isEmpty()) {
-                        for (DocumentSnapshot dc : dosesSnapshot.getDocuments()) {
-                            dc.getReference().delete();
+                        for (DocumentSnapshot doseDoc : dosesSnapshot.getDocuments()) {
+                            doseDoc.getReference().delete();
                         }
                     }
-                    deletarVacina(userId, idPet, idVacina);
+                    deletarVacina(idUsuario, idPet, idVacina);
                 });
     }
 
-    private void deletarVacina(String userId, String idPet, String idVacina) {
-        db.collection("usuarios").document(userId)
+    private void deletarVacina(String idUsuario, String idPet, String idVacina) {
+        db.collection("usuarios").document(idUsuario)
                 .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina).delete().addOnSuccessListener(aVoid -> {
-                    verificarVacinasRestantes(userId, idPet);
-                });
+                .collection("vacinas").document(idVacina).delete().addOnSuccessListener(aVoid -> verificarSeAindaHaVacinas(idUsuario, idPet));
     }
 
-    private void verificarVacinasRestantes(String userId, String idPet) {
-        db.collection("usuarios").document(userId)
+    private void verificarSeAindaHaVacinas(String idUsuario, String idPet) {
+        db.collection("usuarios").document(idUsuario)
                 .collection("pets").document(idPet)
                 .collection("vacinas").get().addOnSuccessListener(vacinasSnapshot -> {
                     if (vacinasSnapshot == null || vacinasSnapshot.isEmpty()) {
-                        deletarPets();
+                        deletarPet();
                     }
                 });
     }
 
-    private void deletarPets() {
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet).delete().addOnSuccessListener(aVoid -> {
-                    startActivity(new Intent(this, MainActivity.class));
-                });
+    private void deletarPet() {
+        String idUsuario = mAuth.getCurrentUser().getUid();
+        db.collection("usuarios").document(idUsuario)
+                .collection("pets").document(idPet).delete().addOnSuccessListener(aVoid -> startActivity(new Intent(this, MainActivity.class)));
     }
 
 
-
-    private void mostrarSnackbar(String mensagem) {
-        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
+    //-------------- Utilitários --------------
+    private void mostrarSnackbar() {
+        Snackbar.make(binding.getRoot(), "Campos obrigatórios estão vazios. Por favor, preencha todos os campos para continuar.", Snackbar.LENGTH_SHORT)
                 .setBackgroundTint(getColor(R.color.md_theme_primary))
                 .setActionTextColor(getColor(R.color.md_theme_onPrimary))
                 .show();
@@ -316,5 +314,4 @@ public class editPetActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, lista);
         autoCompleteTextView.setAdapter(adapter);
     }
-
 }

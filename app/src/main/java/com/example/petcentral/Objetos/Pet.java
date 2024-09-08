@@ -10,11 +10,11 @@ public class Pet {
     private String sexo;
     private Timestamp dataNascimento;
 
-    public Pet(){
+    public Pet() {
 
     }
 
-    public Pet (String id,String nome, String especie, String raca, String sexo, Timestamp dataNascimento){
+    public Pet(String id, String nome, String especie, String raca, String sexo, Timestamp dataNascimento) {
         this.id = id;
         this.nome = nome;
         this.especie = especie;

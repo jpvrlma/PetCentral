@@ -1,20 +1,16 @@
 package com.example.petcentral.Usuario;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
-import androidx.core.util.Pair;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditUserBinding;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -27,12 +23,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -46,8 +39,6 @@ public class editUserActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
 
-    private MaterialAutoCompleteTextView autoCompleteTextViewSexo;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,8 +50,8 @@ public class editUserActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        autoCompleteTextViewSexo = binding.autoCompleteSexo;
-        inicializarAutoCompleteTextViewLocal(autoCompleteTextViewSexo,R.array.GeneroArray);
+        MaterialAutoCompleteTextView autoCompleteTextViewSexo = binding.autoCompleteSexo;
+        inicializarAutoCompleteTextViewLocal(autoCompleteTextViewSexo, R.array.GeneroArray);
 
         getUsuario();
         clickListeners();
@@ -72,34 +63,18 @@ public class editUserActivity extends AppCompatActivity {
         });
     }
 
-    private void validarCampos() {
-        String nome = Objects.requireNonNull(binding.editTextNome.getText()).toString().trim();
-        String sexo = binding.autoCompleteSexo.getText().toString().trim();
-        String dataNascimento = Objects.requireNonNull(binding.editTextNascimento.getText()).toString().trim();
-        if (nome.isEmpty()) {
-            binding.textInputLayoutNome.setError("Campo obrigatório");
-        } else {
-            binding.autoCompleteSexo.setText(sexo,false);
-            binding.editTextNascimento.setText(dataNascimento);
-            atualizarUsuario(nome, sexo, dataNascimento);
-        }
-    }
-
+    //Cliques
     private void clickListeners() {
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
+
         binding.editTextNascimento.setOnClickListener(v -> startDatePicker());
+
         binding.backButton.setOnClickListener(v -> finish());
 
         binding.editTextNome.setOnClickListener(v -> binding.textInputLayoutNome.setError(null));
     }
 
-    private void mostrarSnackbar(String mensagem) {
-        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
-                .setBackgroundTint(getColor(R.color.md_theme_primary))
-                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
-                .show();
-    }
-
+    //Carregar dados do usuário
     private void getUsuario() {
         binding.main.setVisibility(View.GONE);
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
@@ -107,19 +82,36 @@ public class editUserActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
-                        binding.editTextNome.setText(document.getString("nome"));
-                        binding.autoCompleteSexo.setText(document.getString("sexo"), false);
-
-                        Date dataNascimento = document.getTimestamp("dataNascimento").toDate();
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-                        String dataFormatada = dateFormat.format(dataNascimento);
-
-                        binding.editTextNascimento.setText(dataFormatada);
-
+                        if (document != null) {
+                            binding.editTextNome.setText(document.getString("nome"));
+                            binding.autoCompleteSexo.setText(document.getString("sexo"), false);
+                            Timestamp timestamp = document.getTimestamp("dataNascimento");
+                            if (timestamp != null) {
+                                Date dataNascimento = timestamp.toDate();
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+                                String dataFormatada = dateFormat.format(dataNascimento);
+                                binding.editTextNascimento.setText(dataFormatada);
+                            }
+                        }
                         binding.main.setVisibility(View.VISIBLE);
                     }
                 }).addOnFailureListener(e -> Log.e("ERRO FIRESTORE DATA", Objects.requireNonNull(e.getMessage())));
+    }
+
+
+    // --------------------- EDIÇAO DO USUARIO ----------------
+    private void validarCampos() {
+        String nome = Objects.requireNonNull(binding.editTextNome.getText()).toString().trim();
+        String sexo = binding.autoCompleteSexo.getText().toString().trim();
+        String dataNascimento = Objects.requireNonNull(binding.editTextNascimento.getText()).toString().trim();
+        if (nome.isEmpty()) {
+            binding.textInputLayoutNome.setError("Campo obrigatório");
+        } else {
+            binding.autoCompleteSexo.setText(sexo, false);
+            binding.editTextNascimento.setText(dataNascimento);
+            atualizarUsuario(nome, sexo, dataNascimento);
+        }
     }
 
     private void atualizarUsuario(String nome, String sexo, String dataNascimento) {
@@ -130,13 +122,19 @@ public class editUserActivity extends AppCompatActivity {
                 .addOnFailureListener(e -> mostrarSnackbar("Algo saiu mal"));
     }
 
+    // ------------------- Utilitários --------------------
     private void inicializarAutoCompleteTextViewLocal(MaterialAutoCompleteTextView autoCompleteTextView, int arrayResourceId) {
         String[] opcoes = getResources().getStringArray(arrayResourceId);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, opcoes);
         autoCompleteTextView.setAdapter(adapter);
     }
 
-
+    private void mostrarSnackbar(String mensagem) {
+        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(getColor(R.color.md_theme_primary))
+                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
+                .show();
+    }
 
     private void startDatePicker() {
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
@@ -151,8 +149,6 @@ public class editUserActivity extends AppCompatActivity {
         });
         materialDatePicker.show(getSupportFragmentManager(), "TAG");
     }
-
-
 
     private Timestamp converterParaTimestamp(String dataStr) {
         try {

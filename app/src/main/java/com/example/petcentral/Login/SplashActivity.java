@@ -28,16 +28,17 @@ public class SplashActivity extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         Handler handler = new Handler();
 
+        //Verificar se o usuário está logado e direcionar a tela responsável
         if (mAuth.getCurrentUser() != null) {
             handler.postDelayed(() -> {
                 finish();
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
-            },2000);
+            }, 2000);
         } else {
             handler.postDelayed(() -> {
                 finish();
                 startActivity(new Intent(SplashActivity.this, LoginActivity.class));
-            } ,2000);
+            }, 2000);
         }
     }
 }

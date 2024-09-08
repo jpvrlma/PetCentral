@@ -11,7 +11,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityCadastrarDoseBinding;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -22,7 +21,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,13 +30,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * Esta atividade vai permitir que o usuario cadastre uma vacina para um pet.
+ * Sera registrado a vacina e em seguida as doses
+ */
+
 public class CadastrarDoseActivity extends AppCompatActivity {
 
     private ActivityCadastrarDoseBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private MaterialAutoCompleteTextView autoCompleteTextViewMarca;
-    private final ArrayList<String> idMarcaSelecionados = new ArrayList<>();
     private ArrayList<Long> intervaloDias = new ArrayList<>();
 
     @Override
@@ -65,7 +67,20 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         });
     }
 
+    //Cliques
+    private void clickListeners() {
+        binding.btnVoltar.setOnClickListener(v -> finish());
 
+        binding.btnCancelar.setOnClickListener(v -> finish());
+
+        binding.editTextDataAplicacao.setOnClickListener(v -> startDatePicker());
+
+        binding.btnRegistrar.setOnClickListener(v -> validarCampos());
+
+        binding.autoCompleteMarca.setOnClickListener(v -> binding.InputLayoutMarca.setError(null));
+    }
+
+    // --------------------- Carregamentos ---------------------------
     private void carregarInfoDaVacina() {
         String idVacina = getIntent().getStringExtra("idVacina");
         String idEspecie = getIntent().getStringExtra("idEspecie");
@@ -79,11 +94,11 @@ public class CadastrarDoseActivity extends AppCompatActivity {
                         String nome = documentSnapshot.getString("nome");
                         binding.tvNome.setText(nome);
                         binding.tvResumo.setText(resumo);
-
                     }
                 });
     }
 
+    //Menus dropdown
     private void carregarMarcaAutoComplete() {
         String idEspecie = getIntent().getStringExtra("idEspecie");
         String idVacina = getIntent().getStringExtra("idVacina");
@@ -91,20 +106,20 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").document(idVacina)
                 .collection("marcas").get().addOnSuccessListener(queryDocumentSnapshots -> {
+
                     if (queryDocumentSnapshots != null) {
                         ArrayList<String> nomeMarcas = new ArrayList<>();
+
                         for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
-                            String idMarca = dc.getId();
                             String nome = dc.getString("nome");
-                            idMarcaSelecionados.add(idMarca);
                             nomeMarcas.add(nome);
                         }
                         inicializarAutoComplete(autoCompleteTextViewMarca, nomeMarcas);
                     }
-
                 });
     }
 
+    // ----------------- REGISTRO DE DOSES/VACINA -----------------
     private void validarCampos() {
         String marca = binding.autoCompleteMarca.getText().toString().trim();
         String lote = binding.editTextLote.getText().toString().trim();
@@ -128,6 +143,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         }
 
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
+
         lote = lote.isEmpty() ? null : lote;
         anotacoes = anotacoes.isEmpty() ? null : anotacoes;
         local = local.isEmpty() ? null : local;
@@ -136,7 +152,6 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         salvarVacinaFirebase(dataAplicacaoTimestamp);
         salvarDoseFirebase(dataAplicacaoTimestamp, anotacoes, marca, lote, local, nomeVeterinario);
     }
-
 
     private void salvarVacinaFirebase(Timestamp dataAplicacao) {
         String idPet = getIntent().getStringExtra("idPet");
@@ -150,14 +165,13 @@ public class CadastrarDoseActivity extends AppCompatActivity {
             HashMap<String, Object> vacina = new HashMap<>();
             vacina.put("dataAplicacao", dataAplicacao);
             vacina.put("proximaDose", proximaDose);
-            vacina.put("nome",nome);
+            vacina.put("nome", nome);
 
             db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                     .collection("pets").document(idPet)
                     .collection("vacinas").document(idVacina).set(vacina);
         }
     }
-
 
     private void salvarDoseFirebase(Timestamp dataAplicacao, String anotacoes, String marca, String lote, String local, String nomeVeterinario) {
         String idPet = getIntent().getStringExtra("idPet");
@@ -196,13 +210,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         }
     }
 
-    public Timestamp calcularProximaDoseDias(Timestamp dataAplicacao, long intervaloDias) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTime(dataAplicacao.toDate());
-        calendar.add(Calendar.DAY_OF_YEAR, (int) intervaloDias);
-        return new Timestamp(calendar.getTime());
-    }
-
+    // ---------------- GERAÇÃO DE NOVAS DOSES ----------------
     private void gerarDosesFuturas(Timestamp dataAplicacao, ArrayList<Long> intervaloDias) {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
@@ -235,7 +243,14 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         }
 
     }
+    // ------------------ Utilitários -------------------------------
 
+    public Timestamp calcularProximaDoseDias(Timestamp dataAplicacao, long intervaloDias) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        calendar.setTime(dataAplicacao.toDate());
+        calendar.add(Calendar.DAY_OF_YEAR, (int) intervaloDias);
+        return new Timestamp(calendar.getTime());
+    }
 
     private Timestamp converterParaTimestamp(String dataStr) {
         try {
@@ -261,7 +276,6 @@ public class CadastrarDoseActivity extends AppCompatActivity {
                 .show();
     }
 
-
     private void startDatePicker() {
         binding.InputLayoutDataAplicacao.setError(null);
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
@@ -281,13 +295,4 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, lista);
         autoCompleteTextView.setAdapter(adapter);
     }
-
-    private void clickListeners() {
-        binding.btnVoltar.setOnClickListener(v -> finish());
-        binding.btnCancelar.setOnClickListener(v -> finish());
-        binding.editTextDataAplicacao.setOnClickListener(v -> startDatePicker());
-        binding.btnRegistrar.setOnClickListener(v -> validarCampos());
-        binding.autoCompleteMarca.setOnClickListener(v -> binding.InputLayoutMarca.setError(null));
-    }
-
 }

@@ -51,33 +51,14 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    //Cliques
     private void clickListeners() {
         binding.btnLogin.setOnClickListener(v -> loginFirebase());
         binding.textCriar.setOnClickListener(v -> startActivity(new Intent(this, CadastroActivity.class)));
         binding.textEsqueci.setOnClickListener(v -> startActivity(new Intent(this, ResetActivity.class)));
     }
 
-    private void mostrarSnackbar(String mensagem) {
-        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
-                .setBackgroundTint(getColor(R.color.md_theme_primary))
-                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
-                .show();
-    }
-
-    private boolean isEmailValido(String email) {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    private void errosLogin(Exception exception) {
-        String erro;
-        if (exception instanceof FirebaseAuthInvalidCredentialsException) {
-            erro = "Email ou senha incorretos, tente novamente";
-        } else {
-            erro = "Algo saiu mal";
-        }
-        mostrarSnackbar(erro);
-    }
-
+    //Metodos para o Login do Firebase
     private void loginFirebase() {
         final String email = Objects.requireNonNull(binding.editEmail.getText()).toString();
         final String senha = Objects.requireNonNull(binding.editSenha.getText()).toString();
@@ -117,9 +98,33 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
     }
+
+    //---------- Utilitários ----------
+    private void mostrarSnackbar(String mensagem) {
+        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(getColor(R.color.md_theme_primary))
+                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
+                .show();
+    }
+
+    private boolean isEmailValido(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
+    private void errosLogin(Exception exception) {
+        String erro;
+        if (exception instanceof FirebaseAuthInvalidCredentialsException) {
+            erro = "Email ou senha incorretos, tente novamente";
+        } else {
+            erro = "Algo saiu mal";
+        }
+        mostrarSnackbar(erro);
+    }
+
+    //Evitar voltar para o SplashScreen
     @SuppressLint("MissingSuperCall")
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
 
     }
 }

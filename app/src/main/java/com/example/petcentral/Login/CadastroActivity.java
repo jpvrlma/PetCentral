@@ -1,7 +1,6 @@
 package com.example.petcentral.Login;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -55,6 +54,7 @@ public class CadastroActivity extends AppCompatActivity {
 
     }
 
+    //Cliques
     private void clickListeners() {
         binding.btncadastrar.setOnClickListener(v -> validarCampos());
         binding.btnVoltar.setOnClickListener(v -> finish());
@@ -63,17 +63,7 @@ public class CadastroActivity extends AppCompatActivity {
         binding.editSenha.setOnClickListener(v -> binding.containerSenha.setError(null));
     }
 
-    private boolean isEmailValido(String email) {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    private void mostrarSnackbar(String mensagem) {
-        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
-                .setBackgroundTint(getColor(R.color.md_theme_primary))
-                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
-                .show();
-    }
-
+    //Metodos para cadastro
     private void validarCampos() {
         final String nome = Objects.requireNonNull(binding.editNome.getText()).toString().trim();
         final String email = Objects.requireNonNull(binding.editEmail.getText()).toString().trim();
@@ -130,6 +120,14 @@ public class CadastroActivity extends AppCompatActivity {
                 });
     }
 
+    // -------- Utilitários --------
+    private void mostrarSnackbar(String mensagem) {
+        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(getColor(R.color.md_theme_primary))
+                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
+                .show();
+    }
+
     private void errosCadastro(Exception exception) {
         String erro;
         if (exception instanceof FirebaseAuthUserCollisionException) {
@@ -141,4 +139,9 @@ public class CadastroActivity extends AppCompatActivity {
         }
         mostrarSnackbar(erro);
     }
+
+    private boolean isEmailValido(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
+    }
+
 }

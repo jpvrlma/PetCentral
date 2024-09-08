@@ -2,13 +2,13 @@ package com.example.petcentral.Objetos;
 
 import com.google.firebase.Timestamp;
 
-public class DoseVacina extends Dose{
+public class DoseVacina extends Dose {
 
     private String marca;
     private String lote;
     private String local;
     private String nomeVeterinario;
-    private  boolean aplicada;
+    private boolean aplicada;
 
     public DoseVacina() {
     }

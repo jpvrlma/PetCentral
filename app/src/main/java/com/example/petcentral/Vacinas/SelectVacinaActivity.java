@@ -18,12 +18,11 @@ import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivitySelectVacinaBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,7 +36,6 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private vacinaAdapter adapter;
-    private RecyclerView recyclerView;
     private ArrayList<Vacinas> vacinasArrayList;
     private String idEspecie;
     private Long idadePetMili;
@@ -53,12 +51,12 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        recyclerView = binding.recyclerView;
+        RecyclerView recyclerView = binding.recyclerView;
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         vacinasArrayList = new ArrayList<>();
-        adapter = new vacinaAdapter(this,vacinasArrayList,this);
+        adapter = new vacinaAdapter(this, vacinasArrayList, this);
         recyclerView.setAdapter(adapter);
         carregarDadosPet();
         clickListeners();
@@ -71,12 +69,13 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
 
     }
 
-    private void clickListeners(){
+    //Cliques
+    private void clickListeners() {
         binding.btnVoltar.setOnClickListener(v -> finish());
     }
 
-
-    public void carregarDadosPet(){
+    // ----------------------- CARREGAMENTOS ---------------
+    public void carregarDadosPet() {
         String idPet = getIntent().getStringExtra("idPet");
         db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
                 .collection("pets").document(Objects.requireNonNull(idPet)).get()
@@ -88,7 +87,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                         binding.textRaca.setText(pet.getRaca());
                         idEspecie = pet.getEspecie();
                         idadePetMili = pet.getDataNascimento().toDate().getTime();
-                        if (pet.getDataNascimento() != null){
+                        if (pet.getDataNascimento() != null) {
                             Date dataNascimento = pet.getDataNascimento().toDate();
                             String idade = calcularIdadeFormatada(dataNascimento);
                             binding.textIdade.setText(idade);
@@ -98,15 +97,16 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                 });
     }
 
-    private void exibirVacinas(){
+    // RECYCLER VIEW DE VACINAS CADASTRADAS NO FIREBASE
+    private void exibirVacinas() {
         db.collection("especies").document(idEspecie)
                 .collection("vacinas").addSnapshotListener((value, error) -> {
-                    if (error != null){
+                    if (error != null) {
                         Log.e("ERRO FIRESTORE", error.getMessage());
                         return;
                     }
                     vacinasArrayList.clear();
-                    for (QueryDocumentSnapshot dc : value){
+                    for (QueryDocumentSnapshot dc : value) {
                         Vacinas vacinas = dc.toObject(Vacinas.class);
                         vacinas.setId(dc.getId());
                         vacinasArrayList.add(vacinas);
@@ -114,36 +114,8 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                     adapter.notifyDataSetChanged();
                 });
     }
-    public static String calcularIdadeFormatada(Date dataNascimento) {
-        Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        dataDeNascimentoCalendar.setTime(dataNascimento);
-        Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
-        int anos = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
-        int meses = dataAtualCalendar.get(Calendar.MONTH) - dataDeNascimentoCalendar.get(Calendar.MONTH);
 
-        if (meses < 0) {
-            anos--;
-            meses += 12;
-        }
-        StringBuilder idadeFormatada = new StringBuilder();
-        if (anos > 0) {
-            idadeFormatada.append(anos).append(anos == 1 ? " ano" : " anos");
-        }
-        if (meses > 0) {
-            if (idadeFormatada.length() > 0) {
-                idadeFormatada.append(" e ");
-            }
-            idadeFormatada.append(meses).append(meses == 1 ? " mês" : " meses");
-        }
-        return idadeFormatada.toString();
-    }
-    private void mostrarSnackbar(String mensagem) {
-        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
-                .setBackgroundTint(getColor(R.color.md_theme_primary))
-                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
-                .show();
-    }
-
+    // ---------------- VALIDAÇOES PARA SELECIONAR UMA VACINA ------------------
     private void verificarSeVacinaJaExiste(String idPet, String idVacina, String nomeVacina) {
         db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
                 .collection("pets").document(idPet)
@@ -160,6 +132,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                     mostrarSnackbar("Erro ao verificar a vacina: " + e.getMessage());
                 });
     }
+
     private void verificarIdadeParaVacina(String idPet, String idVacina, String nomeVacina) {
         Date idadePet = new Date(idadePetMili);
 
@@ -184,6 +157,39 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
         }
     }
 
+    // ----------------------- Utilitários --------------------------------
+    public static String calcularIdadeFormatada(Date dataNascimento) {
+        Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        dataDeNascimentoCalendar.setTime(dataNascimento);
+        Calendar dataAtualCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+        int anos = dataAtualCalendar.get(Calendar.YEAR) - dataDeNascimentoCalendar.get(Calendar.YEAR);
+        int meses = dataAtualCalendar.get(Calendar.MONTH) - dataDeNascimentoCalendar.get(Calendar.MONTH);
+
+        if (meses < 0) {
+            anos--;
+            meses += 12;
+        }
+        StringBuilder idadeFormatada = new StringBuilder();
+        if (anos > 0) {
+            idadeFormatada.append(anos).append(anos == 1 ? " ano" : " anos");
+        }
+        if (meses > 0) {
+            if (idadeFormatada.length() > 0) {
+                idadeFormatada.append(" e ");
+            }
+            idadeFormatada.append(meses).append(meses == 1 ? " mês" : " meses");
+        }
+        return idadeFormatada.toString();
+    }
+
+    private void mostrarSnackbar(String mensagem) {
+        Snackbar.make(binding.getRoot(), mensagem, Snackbar.LENGTH_SHORT)
+                .setBackgroundTint(getColor(R.color.md_theme_primary))
+                .setActionTextColor(getColor(R.color.md_theme_onPrimary))
+                .show();
+    }
+
+    // Métodos da interface
     @Override
     public void onSelectClick(int position) {
         Vacinas vacinas = vacinasArrayList.get(position);
@@ -191,8 +197,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
         String idPet = getIntent().getStringExtra("idPet");
         String nome = vacinas.getNome();
 
-        verificarSeVacinaJaExiste(idPet,idVacina,nome);
+        verificarSeVacinaJaExiste(idPet, idVacina, nome);
 
     }
-
 }

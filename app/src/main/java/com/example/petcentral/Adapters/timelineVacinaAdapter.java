@@ -31,7 +31,7 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
     private ArrayList<Vacinas> vacinasArrayList;
     private final OnSelectInterface selectInterface;
 
-    public timelineVacinaAdapter(Context context, ArrayList<Vacinas> vacinasArrayList,OnSelectInterface selectInterface) {
+    public timelineVacinaAdapter(Context context, ArrayList<Vacinas> vacinasArrayList, OnSelectInterface selectInterface) {
         this.context = context;
         this.vacinasArrayList = vacinasArrayList;
         this.selectInterface = selectInterface;
@@ -40,21 +40,22 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
     @NonNull
     @Override
     public timelineVacinaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(RecyclerExibirVacinaItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false),selectInterface);
+        return new ViewHolder(RecyclerExibirVacinaItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), selectInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull timelineVacinaAdapter.ViewHolder holder, int position) {
         Vacinas vacinas = vacinasArrayList.get(position);
-
+        //Carregar nome
         holder.binding.tvNome.setText(vacinas.getNome());
 
+        //Carregar data da ultima dose
         if (vacinas.getDataAplicacao() != null) {
             holder.binding.tvDataDoseAtual.setText(formatarData(vacinas.getDataAplicacao()));
         } else {
             holder.binding.tvDataDoseAtual.setText("Data não disponível");
         }
-
+        //Carregar proxima dose e verificar se esta pendente
         if (vacinas.getProximaDose() != null) {
             holder.binding.tvDataProximaDose.setText(formatarData(vacinas.getProximaDose()));
             carregarStatus(vacinas.getProximaDose().toDate(), holder);
@@ -68,17 +69,18 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
         return vacinasArrayList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerExibirVacinaItemBinding binding;
-        public ViewHolder(@NonNull RecyclerExibirVacinaItemBinding binding,OnSelectInterface selectInterface) {
+
+        public ViewHolder(@NonNull RecyclerExibirVacinaItemBinding binding, OnSelectInterface selectInterface) {
             super(binding.getRoot());
             this.binding = binding;
 
 
             binding.cardView.setOnClickListener(v -> {
-                if (selectInterface != null){
+                if (selectInterface != null) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION){
+                    if (position != RecyclerView.NO_POSITION) {
                         selectInterface.onSelectClick(position);
                     }
                 }
@@ -86,7 +88,7 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
         }
     }
 
-    private static String formatarData(Timestamp data){
+    private static String formatarData(Timestamp data) {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         String dataFormatada = sdf.format(data.toDate());
@@ -96,7 +98,6 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
     private void carregarStatus(Date proximaDose, ViewHolder holder) {
         Calendar calendarAtual = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         Date dataAtual = calendarAtual.getTime();
-
 
         if (dataAtual.before(proximaDose)) {
             holder.binding.tvStatus.setText("Status: Em dia");

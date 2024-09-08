@@ -12,7 +12,7 @@ public class Dose {
     public Dose() {
     }
 
-    public Dose(String id, Timestamp dataAplicacao, Timestamp proximaDose, String anotacoes,int numeroDose) {
+    public Dose(String id, Timestamp dataAplicacao, Timestamp proximaDose, String anotacoes, int numeroDose) {
         this.id = id;
         this.dataAplicacao = dataAplicacao;
         this.proximaDose = proximaDose;

@@ -34,7 +34,7 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
     ArrayList<Pet> petArrayList;
     private final PetInterface petInterface;
 
-    public petAdapter(Context context, ArrayList<Pet> petArrayList,PetInterface petInterface) {
+    public petAdapter(Context context, ArrayList<Pet> petArrayList, PetInterface petInterface) {
         this.context = context;
         this.petArrayList = petArrayList;
         this.petInterface = petInterface;
@@ -43,18 +43,20 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
     @NonNull
     @Override
     public petAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(RecyclerItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false),petInterface);
+        return new ViewHolder(RecyclerItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), petInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull petAdapter.ViewHolder holder, int position) {
         Pet pet = petArrayList.get(position);
 
+        //Carregar nome,especie e raça
         holder.binding.textNome.setText(pet.getNome());
         holder.binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
         holder.binding.textRaca.setText(pet.getRaca());
 
-        if (pet.getDataNascimento() != null){
+        //Mostrar a idade do pet
+        if (pet.getDataNascimento() != null) {
             Date dataNascimento = pet.getDataNascimento().toDate();
             String idade = calcularIdadeFormatada(dataNascimento);
             holder.binding.textIdade.setText(idade);
@@ -67,13 +69,14 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
         return petArrayList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerItemBinding binding;
-        public ViewHolder(@NonNull RecyclerItemBinding binding,PetInterface petInterface) {
+
+        public ViewHolder(@NonNull RecyclerItemBinding binding, PetInterface petInterface) {
             super(binding.getRoot());
             this.binding = binding;
 
-            binding.cardView.setOnClickListener(v ->{
+            binding.cardView.setOnClickListener(v -> {
                 if (petInterface != null) {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
@@ -83,9 +86,9 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
             });
 
             binding.btnEditar.setOnClickListener(v -> {
-                if (petInterface != null){
+                if (petInterface != null) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION){
+                    if (position != RecyclerView.NO_POSITION) {
                         petInterface.onEditClick(position);
                     }
                 }
@@ -93,6 +96,7 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
 
         }
     }
+
     public static String calcularIdadeFormatada(Date dataNascimento) {
         Calendar dataDeNascimentoCalendar = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
         dataDeNascimentoCalendar.setTime(dataNascimento);

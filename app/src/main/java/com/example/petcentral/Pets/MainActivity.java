@@ -70,13 +70,20 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         petArrayList = new ArrayList<>();
-        petAdapter = new petAdapter(this, petArrayList,this);
+        petAdapter = new petAdapter(this, petArrayList, this);
         recyclerView.setAdapter(petAdapter);
 
         exibirRecycler();
 
     }
 
+    //Cliques
+    private void clickListeners() {
+        binding.floatingActionButton.setOnClickListener(v -> startActivity(new Intent(this, CadastroPetActivity.class)));
+        binding.btnSettings.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));
+    }
+
+    //Exibir o Recycler view de pets cadastrados
     private void exibirRecycler() {
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets")
@@ -91,11 +98,12 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
                         Pet pet = dc.toObject(Pet.class);
                         pet.setId(dc.getId());
                         petArrayList.add(pet);
-                        }
+                    }
                     petAdapter.notifyDataSetChanged();
                 });
     }
 
+    //Configurar o text view de saudacao para o usuário
     private void saudacao() {
         LocalTime horaAtual = LocalTime.now();
 
@@ -108,12 +116,7 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         }
     }
 
-    private void clickListeners() {
-        binding.floatingActionButton.setOnClickListener(v -> startActivity(new Intent(this, CadastroPetActivity.class)));
-        binding.btnSettings.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));
-    }
-
-
+    //Métodos da interface
     @Override
     public void onEditClick(int position) {
         Pet pet = petArrayList.get(position);
@@ -134,11 +137,10 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
 
     }
 
+    //Evitar voltar para a tela de login
     @SuppressLint("MissingSuperCall")
     @Override
-    public void onBackPressed(){
+    public void onBackPressed() {
 
     }
-
-
 }

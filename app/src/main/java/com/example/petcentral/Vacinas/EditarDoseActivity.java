@@ -27,10 +27,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 
 
-import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,13 +38,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
+/**
+ * Esta atividade vai permitir que o usuario edite uma vacina para um pet.
+ * Ao editar uma dose as futuras serao atualizadas,ou seja se excluir a 2 a 3 tbm sera
+ */
+
 public class EditarDoseActivity extends AppCompatActivity {
 
     private ActivityEditarDoseBinding binding;
     private FirebaseFirestore db;
     private FirebaseAuth mAuth;
     private MaterialAutoCompleteTextView autoCompleteTextViewMarca;
-    private final ArrayList<String> idMarcaSelecionados = new ArrayList<>();
     private ArrayList<Long> intervaloDias = new ArrayList<>();
     private int numeroDose;
 
@@ -73,14 +75,20 @@ public class EditarDoseActivity extends AppCompatActivity {
         });
     }
 
+    //Cliques
     private void clickListeners() {
         binding.btnVoltar.setOnClickListener(v -> finish());
+
         binding.btnCancelar.setOnClickListener(v -> finish());
+
         binding.btnRegistrar.setOnClickListener(v -> validarCampos());
+
         binding.btnExcluir.setOnClickListener(v -> mostrarAlertaParaExclusao());
+
         binding.editTextDataAplicacao.setOnClickListener(v -> startDatePicker());
     }
 
+    // --------------------- CARREGAMENTOS ----------------------------
     private void carregarInfoDaVacina() {
         String idVacina = getIntent().getStringExtra("idVacina");
         String idEspecie = getIntent().getStringExtra("idEspecie");
@@ -91,27 +99,6 @@ public class EditarDoseActivity extends AppCompatActivity {
                     if (documentSnapshot != null) {
                         intervaloDias = (ArrayList<Long>) documentSnapshot.get("intervalos");
                     }
-                });
-    }
-
-    private void carregarMarcaAutoComplete() {
-        String idEspecie = getIntent().getStringExtra("idEspecie");
-        String idVacina = getIntent().getStringExtra("idVacina");
-
-        db.collection("especies").document(idEspecie)
-                .collection("vacinas").document(idVacina)
-                .collection("marcas").get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null) {
-                        ArrayList<String> nomeMarcas = new ArrayList<>();
-                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
-                            String idMarca = dc.getId();
-                            String nome = dc.getString("nome");
-                            idMarcaSelecionados.add(idMarca);
-                            nomeMarcas.add(nome);
-                        }
-                        inicializarAutoComplete(autoCompleteTextViewMarca, nomeMarcas);
-                    }
-
                 });
     }
 
@@ -128,14 +115,17 @@ public class EditarDoseActivity extends AppCompatActivity {
                     if (documentSnapshot != null) {
                         DoseVacina doseVacina = documentSnapshot.toObject(DoseVacina.class);
                         if (doseVacina != null) {
+                            //Dados basicos da dose
                             binding.autoCompleteMarca.setText(doseVacina.getMarca(), false);
                             binding.editTextLote.setText(doseVacina.getLote());
                             binding.editTextAnotacoes.setText(doseVacina.getAnotacoes());
                             binding.editTextLocal.setText(doseVacina.getLocal());
                             binding.editTextNomeVeterinario.setText(doseVacina.getNomeVeterinario());
                             binding.tvNome.setText(idDose);
+
                             numeroDose = doseVacina.getNumeroDose();
 
+                            //Data de aplicação
                             if (doseVacina.getDataAplicacao() != null) {
                                 Date dataAplicacao = doseVacina.getDataAplicacao().toDate();
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -146,6 +136,7 @@ public class EditarDoseActivity extends AppCompatActivity {
                                 binding.editTextDataAplicacao.setText("");
                             }
 
+                            //Layout para dose 1
                             if (doseVacina.getNumeroDose() == 1) {
                                 binding.switchAplicado.setVisibility(View.GONE);
                                 binding.btnExcluir.setVisibility(View.VISIBLE);
@@ -154,19 +145,38 @@ public class EditarDoseActivity extends AppCompatActivity {
                                 binding.btnExcluir.setVisibility(View.GONE);
                             }
 
-                            if (doseVacina.isAplicada() == true) {
-                                binding.switchAplicado.setChecked(true);
-                            } else {
-                                binding.switchAplicado.setChecked(false);
-                            }
+                            //Carregamento do switch
+                            binding.switchAplicado.setChecked(doseVacina.isAplicada());
                         } else {
                             mostrarSnackbar("Erro ao carregar dados da dose");
                         }
                     }
                 });
-
     }
 
+    // Menus dropdown
+    private void carregarMarcaAutoComplete() {
+        String idEspecie = getIntent().getStringExtra("idEspecie");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("especies").document(idEspecie)
+                .collection("vacinas").document(idVacina)
+                .collection("marcas").get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null) {
+                        ArrayList<String> nomeMarcas = new ArrayList<>();
+
+                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
+                            String idMarca = dc.getId();
+                            String nome = dc.getString("nome");
+                            nomeMarcas.add(nome);
+                        }
+                        inicializarAutoComplete(autoCompleteTextViewMarca, nomeMarcas);
+                    }
+                });
+    }
+
+
+    // --------------------- Gatilho para edições --------------------------------
     private void validarCampos() {
         String marca = binding.autoCompleteMarca.getText().toString().trim();
         String lote = binding.editTextLote.getText().toString().trim();
@@ -196,7 +206,7 @@ public class EditarDoseActivity extends AppCompatActivity {
         local = local.isEmpty() ? null : local;
         nomeVeterinario = nomeVeterinario.isEmpty() ? null : nomeVeterinario;
 
-        //Nao aplicado
+        //Switch Nao aplicado
         if (!binding.switchAplicado.isChecked()) {
             limparCamposVacina();
             limparDosesFuturas();
@@ -204,13 +214,161 @@ public class EditarDoseActivity extends AppCompatActivity {
             atualizarVacinaTimeline();
             return;
         }
-        //Aplicado
+        //Switch Aplicado
         verificarUltimaDoseAplicada(marca, lote, dataAplicacao, anotacoes, local, nomeVeterinario);
         atualizarDosesFuturas(numeroDose, dataAplicacaoTimestamp);
-        atualizarVacinaTimeline();
         verificarSeUltimaDoseEChamarGeracao();
     }
 
+    // --------------------- EDIÇAO DE DOSES ----------------------
+
+    private void verificarUltimaDoseAplicada(String marca, String lote, String dataAplicacao, String anotacoes, String local, String nomeVeterinario) {
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses")
+                .whereEqualTo("aplicada", true)
+                .orderBy("numeroDose", Query.Direction.DESCENDING)
+                .limit(1)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null) {
+                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        int numeroDoseAtual = ultimoDoc.getLong("numeroDose").intValue();
+                        if (numeroDoseAtual > numeroDose) {
+                            mostrarSnackbar("Cadastre a dose anterior primeiro");
+                        } else {
+                            atualizarDose(marca, lote, dataAplicacao, anotacoes, local, nomeVeterinario);
+                        }
+                    }
+                });
+    }
+
+    private void atualizarDose(String marca, String lote, String dataAplicacao, String anotacoes, String local, String nomeVeterinario) {
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+        String idDose = getIntent().getStringExtra("idDose");
+
+        Timestamp timestamp = converterParaTimestamp(dataAplicacao);
+        Timestamp proximaDose = null;
+
+        if (intervaloDias != null && !intervaloDias.isEmpty()) {
+            long intervalo;
+            if (numeroDose < intervaloDias.size()) {
+                intervalo = intervaloDias.get(numeroDose - 1);
+            } else {
+                intervalo = intervaloDias.get(intervaloDias.size() - 1);
+            }
+            proximaDose = calcularProximaDoseDias(timestamp, intervalo);
+        }
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses").document(idDose)
+                .update("marca", marca, "lote", lote, "dataAplicacao", timestamp, "proximaDose", proximaDose, "anotacoes", anotacoes
+                        , "local", local, "nomeVeterinario", nomeVeterinario, "aplicada", binding.switchAplicado.isChecked())
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        atualizarVacinaTimeline();
+                    }
+                });
+    }
+
+    // ----------------------- ATUALIZAÇÃO DE DATAS APOS EDIÇOES ---------------------
+
+    private void atualizarDosesFuturas(int doseAtual, Timestamp dataAplicacao) {
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null) {
+                        Timestamp ultimaAplicacao = dataAplicacao;
+                        int numeroDoseAtual = doseAtual;
+                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
+                            DoseVacina doseVacina = dc.toObject(DoseVacina.class);
+                            if (doseVacina != null && doseVacina.getNumeroDose() > doseAtual && !doseVacina.isAplicada()) {
+                                numeroDoseAtual++;
+                                long intervalo;
+
+                                if (numeroDoseAtual <= intervaloDias.size()) {
+                                    intervalo = intervaloDias.get(numeroDoseAtual - 1);
+                                } else {
+                                    intervalo = intervaloDias.get(intervaloDias.size() - 1);
+                                }
+                                System.out.println("intervaloDias: " + intervalo);
+                                if (ultimaAplicacao != null) {
+                                    ultimaAplicacao = calcularProximaDoseDias(ultimaAplicacao, intervalo);
+                                    dc.getReference().update("proximaDose", ultimaAplicacao)
+                                            .addOnFailureListener(e -> Log.e("AtualizarDosesFuturas", "Erro ao atualizar proximaDose", e));
+                                }
+                            }
+                        }
+                    }
+                });
+    }
+
+    private void pegarUltimaDataEAtualizarDosesFuturas() {
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses")
+                .whereEqualTo("aplicada", true)
+                .orderBy("numeroDose", Query.Direction.DESCENDING)
+                .limit(1)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null) {
+                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
+                        int numeroDoseAtual = ultimoDoc.getLong("numeroDose").intValue();
+                        System.out.println(numeroDoseAtual);
+                        adaptarDatas(ultimaAplicacao);
+                    }
+                });
+    }
+
+    private void adaptarDatas(Timestamp ultimaData) {
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina)
+                .collection("doses")
+                .orderBy("numeroDose", Query.Direction.ASCENDING)
+                .get().addOnSuccessListener(queryDocumentSnapshots -> {
+                    if (queryDocumentSnapshots != null) {
+                        Timestamp ultimaAplicacao = ultimaData;
+                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
+                            DoseVacina doseVacina = dc.toObject(DoseVacina.class);
+                            if (doseVacina != null && !doseVacina.isAplicada()) {
+                                long intervalo;
+                                if (numeroDose < intervaloDias.size()) {
+                                    intervalo = intervaloDias.get(numeroDose - 1);
+                                } else {
+                                    intervalo = intervaloDias.get(intervaloDias.size() - 1);
+                                }
+                                ultimaAplicacao = calcularProximaDoseDias(ultimaAplicacao, intervalo);
+                                dc.getReference().update("proximaDose", ultimaAplicacao);
+                                numeroDose++;
+                            }
+                        }
+                    }
+                });
+    }
+
+    // -------------------------- GERAÇÃO DE NOVAS DOSES -----------------------
 
     private void verificarSeUltimaDoseEChamarGeracao() {
         String idPet = getIntent().getStringExtra("idPet");
@@ -251,11 +409,8 @@ public class EditarDoseActivity extends AppCompatActivity {
                         Timestamp proximaDose = ultimaDose.getTimestamp("proximaDose");
 
                         criarNovaDose(proximaDose, numeroDose + 1);
-
                     }
-                }).addOnFailureListener(e -> {
-                    Log.d(TAG, "GERAR DOSE", e);
-                });
+                }).addOnFailureListener(e -> Log.d(TAG, "GERAR DOSE", e));
     }
 
     private void criarNovaDose(Timestamp proximaDose, int novoNumeroDose) {
@@ -280,73 +435,8 @@ public class EditarDoseActivity extends AppCompatActivity {
                 .collection("doses").document(doseId).set(dose);
     }
 
-    private void excluirTodasAsDosesEVacina() {
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses").get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
-                        doc.getReference().delete();
-                    }
-                    db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                            .collection("pets").document(idPet)
-                            .collection("vacinas").document(idVacina).delete()
-                            .addOnSuccessListener(aVoid -> {
-                                Intent intent = new Intent(EditarDoseActivity.this, ViewVacinasActivity.class);
-                                intent.putExtra("idPet", idPet);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-                                finish();
-                            });
-
-                });
-    }
-
-    private void mostrarAlertaParaExclusao() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirmação de Exclusão")
-                .setMessage("Você tem certeza de que deseja excluir todas as doses e o registro dessa vacina? Essa ação não pode ser desfeita.")
-                .setPositiveButton("Excluir", (dialog, which) -> {
-                    excluirTodasAsDosesEVacina();
-                })
-                .setNegativeButton("Cancelar", (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .show();
-    }
-
-    private void atualizarDose(String marca, String lote, String dataAplicacao, String anotacoes, String local, String nomeVeterinario) {
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
-        String idDose = getIntent().getStringExtra("idDose");
-
-        Timestamp timestamp = converterParaTimestamp(dataAplicacao);
-        Timestamp proximaDose = null;
-
-        if (intervaloDias != null && !intervaloDias.isEmpty()) {
-            long intervalo;
-            if (numeroDose < intervaloDias.size()) {
-                intervalo = intervaloDias.get(numeroDose - 1);
-            } else {
-                intervalo = intervaloDias.get(intervaloDias.size() - 1);
-            }
-            proximaDose = calcularProximaDoseDias(timestamp, intervalo);
-        }
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses").document(idDose)
-                .update("marca", marca, "lote", lote, "dataAplicacao", timestamp, "proximaDose", proximaDose, "anotacoes", anotacoes
-                        , "local", local, "nomeVeterinario", nomeVeterinario, "aplicada", binding.switchAplicado.isChecked());
-    }
-
-
-    private void atualizarDosesFuturas(int doseAtual, Timestamp dataAplicacao) {
+    // ----------------------- ATUALIZAÇAO DE VACINA -----------------------
+    private void atualizarVacinaTimeline() {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
 
@@ -354,34 +444,33 @@ public class EditarDoseActivity extends AppCompatActivity {
                 .collection("pets").document(idPet)
                 .collection("vacinas").document(idVacina)
                 .collection("doses")
+                .whereEqualTo("aplicada", true)
+                .orderBy("numeroDose", Query.Direction.DESCENDING)
+                .limit(1)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null) {
-                        Timestamp ultimaAplicacao = dataAplicacao;
-                        int numeroDoseAtual = doseAtual;
-                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
-                            DoseVacina doseVacina = dc.toObject(DoseVacina.class);
-                            if (doseVacina != null && doseVacina.getNumeroDose() > doseAtual && !doseVacina.isAplicada()) {
-                                numeroDoseAtual++;
-                                long intervalo;
-
-                                if (numeroDoseAtual <= intervaloDias.size()) {
-                                    intervalo = intervaloDias.get(numeroDoseAtual - 1);
-                                } else {
-                                    intervalo = intervaloDias.get(intervaloDias.size() - 1);
-                                }
-                                System.out.println("intervaloDias: " + intervalo);
-                                if (ultimaAplicacao != null) {
-                                    ultimaAplicacao = calcularProximaDoseDias(ultimaAplicacao, intervalo);
-                                    dc.getReference().update("proximaDose", ultimaAplicacao)
-                                            .addOnFailureListener(e -> Log.e("AtualizarDosesFuturas", "Erro ao atualizar proximaDose", e));
-                                }
-                            }
-                        }
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
+                        String nomeDose = ultimoDoc.getId();
+                        System.out.println(nomeDose);
+                        Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
+                        Timestamp ultimaProximaDose = ultimoDoc.getTimestamp("proximaDose");
+                        atualizarVacinaClass(ultimaAplicacao, ultimaProximaDose);
+                    } else {
+                        mostrarSnackbar("Nenhuma dose aplicada");
                     }
-                });
+                }).addOnFailureListener(e -> Log.d(TAG, "get failed with ", e));
     }
 
+    private void atualizarVacinaClass(Timestamp dataAplicacao, Timestamp proximaDose) {
+        String idPet = getIntent().getStringExtra("idPet");
+        String idVacina = getIntent().getStringExtra("idVacina");
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("vacinas").document(idVacina).update("dataAplicacao", dataAplicacao, "proximaDose", proximaDose);
+    }
+
+    // ------------------------ EXCLUSÃO DE VACINAS -------------------------
 
     private void limparCamposVacina() {
 
@@ -421,157 +510,70 @@ public class EditarDoseActivity extends AppCompatActivity {
                         boolean limpar = false;
                         for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
                             String id = dc.getId();
-                            if (id != null) {
-                                // Se encontrar a dose que foi limpa, comece a limpar as subsequentes
-                                System.out.println(id);
-                                if (id.equals(idDose)) {
-                                    limpar = true;
-                                }
-                                if (limpar) {
-                                    // Limpa todas as doses futuras não aplicadas
-                                    HashMap<String, Object> doseFutura = new HashMap<>();
-                                    doseFutura.put("dataAplicacao", null);
-                                    doseFutura.put("anotacoes", null);
-                                    doseFutura.put("marca", null);
-                                    doseFutura.put("lote", null);
-                                    doseFutura.put("local", null);
-                                    doseFutura.put("nomeVeterinario", null);
-                                    doseFutura.put("aplicada", false);
+                            // Se encontrar a dose que foi limpa, comece a limpar as subsequentes
+                            System.out.println(id);
+                            if (id.equals(idDose)) {
+                                limpar = true;
+                            }
+                            if (limpar) {
+                                // Limpa todas as doses futuras não aplicadas
+                                HashMap<String, Object> doseFutura = new HashMap<>();
+                                doseFutura.put("dataAplicacao", null);
+                                doseFutura.put("anotacoes", null);
+                                doseFutura.put("marca", null);
+                                doseFutura.put("lote", null);
+                                doseFutura.put("local", null);
+                                doseFutura.put("nomeVeterinario", null);
+                                doseFutura.put("aplicada", false);
 
-                                    dc.getReference().update(doseFutura);
-                                }
+                                dc.getReference().update(doseFutura);
                             }
                         }
                     }
                 });
     }
 
-    //Com a data pegada no firebase da ultima dose atualiza as outras
-    private void adaptarDatas(Timestamp ultimaData) {
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses")
-                .orderBy("numeroDose", Query.Direction.ASCENDING)
-                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null) {
-                        Timestamp ultimaAplicacao = ultimaData;
-                        for (DocumentSnapshot dc : queryDocumentSnapshots.getDocuments()) {
-                            DoseVacina doseVacina = dc.toObject(DoseVacina.class);
-                            if (doseVacina != null && !doseVacina.isAplicada()) {
-                                long intervalo;
-                                if (numeroDose < intervaloDias.size()) {
-                                    intervalo = intervaloDias.get(numeroDose - 1);
-                                } else{
-                                    intervalo = intervaloDias.get(intervaloDias.size() - 1);
-                                }
-                                ultimaAplicacao = calcularProximaDoseDias(ultimaAplicacao, intervalo);
-                                dc.getReference().update("proximaDose", ultimaAplicacao);
-                                numeroDose++;
-                            }
-                        }
-                    }
-                });
+    private void mostrarAlertaParaExclusao() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmação de Exclusão")
+                .setMessage("Você tem certeza de que deseja excluir todas as doses e o registro dessa vacina? Essa ação não pode ser desfeita.")
+                .setPositiveButton("Excluir", (dialog, which) -> excluirTodasAsDosesEVacina())
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
-
-    //Pega ultima dose onde aplicada igual a true
-    private void pegarUltimaDataEAtualizarDosesFuturas() {
+    private void excluirTodasAsDosesEVacina() {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
                 .collection("vacinas").document(idVacina)
-                .collection("doses")
-                .whereEqualTo("aplicada", true)
-                .orderBy("numeroDose", Query.Direction.DESCENDING)
-                .limit(1)
-                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null) {
-                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
-                        int numeroDoseAtual = ultimoDoc.getLong("numeroDose").intValue();
-                        System.out.println(numeroDoseAtual);
-                        adaptarDatas(ultimaAplicacao);
-                    }
-                });
-    }
-
-    private void verificarUltimaDoseAplicada(String marca, String lote, String dataAplicacao, String anotacoes, String local, String nomeVeterinario){
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses")
-                .whereEqualTo("aplicada", true)
-                .orderBy("numeroDose", Query.Direction.DESCENDING)
-                .limit(1)
-                .get().addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (queryDocumentSnapshots != null){
-                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        int numeroDoseAtual = ultimoDoc.getLong("numeroDose").intValue();
-                        if (numeroDoseAtual < numeroDose){
-                            mostrarSnackbar("Cadastre a dose anterior primeiro");
-                        }else {
-                            atualizarDose(marca,lote,dataAplicacao,anotacoes,local,nomeVeterinario);
-                        }
-                    }
-                });
-    }
-
-    private void atualizarVacinaTimeline() {
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina)
-                .collection("doses")
-                .whereEqualTo("aplicada", true)
-                .orderBy("numeroDose", Query.Direction.DESCENDING)
-                .limit(1)
-                .get()
+                .collection("doses").get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    if (!queryDocumentSnapshots.isEmpty()) {
-                        DocumentSnapshot ultimoDoc = queryDocumentSnapshots.getDocuments().get(0);
-                        Timestamp ultimaAplicacao = ultimoDoc.getTimestamp("dataAplicacao");
-                        Timestamp ultimaProximaDose = ultimoDoc.getTimestamp("proximaDose");
-                        atualizarVacinaClass(ultimaAplicacao, ultimaProximaDose);
-                    } else {
-                        mostrarSnackbar("Nenhuma dose aplicada");
+                    for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
+                        doc.getReference().delete();
                     }
-                }).addOnFailureListener(e -> {
-                    Log.d(TAG, "get failed with ", e);
+                    db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                            .collection("pets").document(idPet)
+                            .collection("vacinas").document(idVacina).delete()
+                            .addOnSuccessListener(aVoid -> {
+                                Intent intent = new Intent(EditarDoseActivity.this, ViewVacinasActivity.class);
+                                intent.putExtra("idPet", idPet);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                startActivity(intent);
+                                finish();
+                            });
+
                 });
     }
 
-    private void atualizarVacinaClass(Timestamp dataAplicacao, Timestamp proximaDose) {
-        String idPet = getIntent().getStringExtra("idPet");
-        String idVacina = getIntent().getStringExtra("idVacina");
 
-
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
-                .collection("pets").document(idPet)
-                .collection("vacinas").document(idVacina).update("dataAplicacao", dataAplicacao, "proximaDose", proximaDose);
-    }
-
+    // ------------------ Utilitários -------------------------------
     public Timestamp calcularProximaDoseDias(Timestamp dataAplicacao, long intervaloDias) {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.setTime(dataAplicacao.toDate());
         calendar.add(Calendar.DAY_OF_YEAR, (int) intervaloDias);
-        return new Timestamp(calendar.getTime());
-    }
-
-    public Timestamp calcularProximaDoseMeses(Timestamp dataAplicacao, int intervaloMeses) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-        calendar.setTime(dataAplicacao.toDate());
-        calendar.add(Calendar.MONTH, intervaloMeses);
         return new Timestamp(calendar.getTime());
     }
 

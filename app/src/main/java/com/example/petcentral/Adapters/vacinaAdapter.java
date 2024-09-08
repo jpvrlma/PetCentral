@@ -19,7 +19,7 @@ public class vacinaAdapter extends RecyclerView.Adapter<vacinaAdapter.ViewHolder
     private ArrayList<Vacinas> vacinasArrayList;
     private final OnSelectInterface selectInterface;
 
-    public vacinaAdapter(Context context, ArrayList<Vacinas> vacinasArrayList,OnSelectInterface selectInterface) {
+    public vacinaAdapter(Context context, ArrayList<Vacinas> vacinasArrayList, OnSelectInterface selectInterface) {
         this.context = context;
         this.vacinasArrayList = vacinasArrayList;
         this.selectInterface = selectInterface;
@@ -28,14 +28,15 @@ public class vacinaAdapter extends RecyclerView.Adapter<vacinaAdapter.ViewHolder
     @NonNull
     @Override
     public vacinaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(RecyclerVacinaItemBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false),selectInterface);
+        return new ViewHolder(RecyclerVacinaItemBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), selectInterface);
     }
 
     @Override
     public void onBindViewHolder(@NonNull vacinaAdapter.ViewHolder holder, int position) {
-            Vacinas vacinas = vacinasArrayList.get(position);
-            holder.binding.tvNome.setText(vacinas.getNome());
-            holder.binding.tvDesc.setText(vacinas.getDescricao());
+        Vacinas vacinas = vacinasArrayList.get(position);
+        //Carregar nome e descrição
+        holder.binding.tvNome.setText(vacinas.getNome());
+        holder.binding.tvDesc.setText(vacinas.getDescricao());
     }
 
     @Override
@@ -43,16 +44,17 @@ public class vacinaAdapter extends RecyclerView.Adapter<vacinaAdapter.ViewHolder
         return vacinasArrayList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerVacinaItemBinding binding;
-        public ViewHolder(@NonNull RecyclerVacinaItemBinding binding,OnSelectInterface selectInterface) {
+
+        public ViewHolder(@NonNull RecyclerVacinaItemBinding binding, OnSelectInterface selectInterface) {
             super(binding.getRoot());
             this.binding = binding;
 
-            binding.cardSelectVacina.setOnClickListener(v ->{
-                if (selectInterface != null){
+            binding.cardSelectVacina.setOnClickListener(v -> {
+                if (selectInterface != null) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION){
+                    if (position != RecyclerView.NO_POSITION) {
                         selectInterface.onSelectClick(position);
                     }
                 }

@@ -1,6 +1,5 @@
 package com.example.petcentral.Login;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 
@@ -48,16 +47,14 @@ public class ResetActivity extends AppCompatActivity {
 
     }
 
+    //Cliques
     private void clickListeners() {
         binding.btnEnviar.setOnClickListener(v -> resetSenha());
         binding.editEmail.setOnClickListener(v -> binding.containerEmail.setError(null));
         binding.backButton.setOnClickListener(v -> finish());
     }
 
-    private boolean isEmailValido(String email) {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
+    //Metodos para reset de senha
     private void resetSenha() {
         final String email = Objects.requireNonNull(binding.editEmail.getText()).toString();
 
@@ -66,7 +63,7 @@ public class ResetActivity extends AppCompatActivity {
             binding.editEmail.requestFocus();
             return;
         }
-        if (!isEmailValido(email)){
+        if (!isEmailValido(email)) {
             binding.containerEmail.setError("Email inválido ou não cadastrado");
             binding.editEmail.requestFocus();
             return;
@@ -81,6 +78,11 @@ public class ResetActivity extends AppCompatActivity {
                 mostrarSnackbar(exception.getMessage());
             }
         });
+    }
+
+    //------------ UTILITÁRIOS ---------------
+    private boolean isEmailValido(String email) {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
     }
 
     private void mostrarSnackbar(String mensagem) {

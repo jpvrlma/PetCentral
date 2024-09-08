@@ -24,7 +24,7 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
     ArrayList<DoseVacina> doseVacinaArrayList;
     private final OnSelectInterface selectInterface;
 
-    public dosesVacinaAdapter(Context context, ArrayList<DoseVacina> doseVacinaArrayList,OnSelectInterface selectInterface) {
+    public dosesVacinaAdapter(Context context, ArrayList<DoseVacina> doseVacinaArrayList, OnSelectInterface selectInterface) {
         this.context = context;
         this.doseVacinaArrayList = doseVacinaArrayList;
         this.selectInterface = selectInterface;
@@ -33,7 +33,7 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
     @NonNull
     @Override
     public dosesVacinaAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ViewHolder(RecyclerDosesBinding.inflate(LayoutInflater.from(parent.getContext()),parent,false),selectInterface);
+        return new ViewHolder(RecyclerDosesBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false), selectInterface);
     }
 
     @Override
@@ -41,13 +41,13 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
         DoseVacina doseVacina = doseVacinaArrayList.get(position);
 
         //Tirar Linha
-        if (position == doseVacinaArrayList.size() - 1){
+        if (position == doseVacinaArrayList.size() - 1) {
             holder.binding.linhaDivisora.setVisibility(View.GONE);
         } else {
             holder.binding.linhaDivisora.setVisibility(View.VISIBLE);
         }
-        //Altera a cor do marcador e da linha de acordo com a data
-        if (doseVacina.isAplicada() == false){
+        //Altera a cor do marcador e da linha de acordo com o boolean retornado
+        if (doseVacina.isAplicada() == false) {
             holder.binding.tvProxima.setVisibility(View.VISIBLE);
             holder.binding.tvDia.setText(formatarData(doseVacina.getProximaDose()));
             holder.binding.marcador.setImageResource(R.drawable.marker_red);
@@ -59,13 +59,13 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
             holder.binding.linhaDivisora.setBackgroundColor(context.getColor(R.color.verde));
         }
 
-        if (doseVacina.getMarca() == null){
+        //Indicar se a vacina foi aplicada ou não
+        if (doseVacina.getMarca() == null) {
             holder.binding.tvMarca.setText("Não aplicada");
-        } else{
+        } else {
             holder.binding.tvMarca.setText(doseVacina.getMarca());
         }
-
-        if (doseVacina.getLote() == null){
+        if (doseVacina.getLote() == null) {
             holder.binding.tvLote.setVisibility(View.GONE);
         } else {
             holder.binding.tvLote.setText(doseVacina.getLote());
@@ -78,16 +78,17 @@ public class dosesVacinaAdapter extends RecyclerView.Adapter<dosesVacinaAdapter.
         return doseVacinaArrayList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder{
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final RecyclerDosesBinding binding;
-        public ViewHolder(@NonNull RecyclerDosesBinding binding,OnSelectInterface selectInterface) {
+
+        public ViewHolder(@NonNull RecyclerDosesBinding binding, OnSelectInterface selectInterface) {
             super(binding.getRoot());
             this.binding = binding;
 
-            binding.cardView.setOnClickListener(v ->{
-                if (selectInterface != null){
+            binding.cardView.setOnClickListener(v -> {
+                if (selectInterface != null) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION){
+                    if (position != RecyclerView.NO_POSITION) {
                         selectInterface.onSelectClick(position);
                     }
                 }
