@@ -58,7 +58,7 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
         //Carregar proxima dose e verificar se esta pendente
         if (vacinas.getProximaDose() != null) {
             holder.binding.tvDataProximaDose.setText(formatarData(vacinas.getProximaDose()));
-            carregarStatus(vacinas.getProximaDose().toDate(), holder);
+            carregarStatus(vacinas.getDataAplicacao().toDate(),vacinas.getProximaDose().toDate(), holder);
         } else {
             holder.binding.tvDataProximaDose.setText("Data não disponível");
         }
@@ -95,21 +95,26 @@ public class timelineVacinaAdapter extends RecyclerView.Adapter<timelineVacinaAd
         return dataFormatada;
     }
 
-    private void carregarStatus(Date proximaDose, ViewHolder holder) {
+    private void carregarStatus(Date dataAplicacao, Date proximaDose, ViewHolder holder) {
         Calendar calendarAtual = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         Date dataAtual = calendarAtual.getTime();
 
-        if (dataAtual.before(proximaDose)) {
+        // Verifica se a vacina já foi aplicada
+        if (dataAplicacao != null && dataAtual.after(dataAplicacao)) {
+            // Se a dose já foi aplicada, está "Em dia"
+            holder.binding.tvStatus.setText("Status: Aplicada");
+            holder.binding.tvStatus.setTextColor(context.getColor(R.color.md_theme_primary));
+        } else if (dataAtual.before(proximaDose)) {
+            // Se a data atual é antes da próxima dose, está "Em dia"
             holder.binding.tvStatus.setText("Status: Em dia");
             holder.binding.tvStatus.setTextColor(context.getColor(R.color.md_theme_primary));
         } else if (dataAtual.after(proximaDose)) {
+            // Se a data atual é depois da próxima dose e não foi aplicada, está "Pendente"
             holder.binding.tvStatus.setText("Status: Pendente");
             holder.binding.tvStatus.setTextColor(context.getColor(R.color.md_theme_error));
-        } else {
-            holder.binding.tvStatus.setText("Status: Em dia");
-            holder.binding.tvStatus.setTextColor(context.getColor(R.color.md_theme_primary));
         }
     }
+
 
 
 }
