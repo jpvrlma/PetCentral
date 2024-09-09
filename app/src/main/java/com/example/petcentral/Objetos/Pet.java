@@ -9,18 +9,34 @@ public class Pet {
     private String raca;
     private String sexo;
     private Timestamp dataNascimento;
+    private String fotoPerfil;
 
     public Pet() {
 
     }
 
-    public Pet(String id, String nome, String especie, String raca, String sexo, Timestamp dataNascimento) {
-        this.id = id;
-        this.nome = nome;
-        this.especie = especie;
-        this.raca = raca;
-        this.sexo = sexo;
+    public Timestamp getDataNascimento() {
+        return dataNascimento;
+    }
+
+    public void setDataNascimento(Timestamp dataNascimento) {
         this.dataNascimento = dataNascimento;
+    }
+
+    public String getEspecie() {
+        return especie;
+    }
+
+    public void setEspecie(String especie) {
+        this.especie = especie;
+    }
+
+    public String getFotoPerfil() {
+        return fotoPerfil;
+    }
+
+    public void setFotoPerfil(String fotoPerfil) {
+        this.fotoPerfil = fotoPerfil;
     }
 
     public String getId() {
@@ -39,14 +55,6 @@ public class Pet {
         this.nome = nome;
     }
 
-    public String getEspecie() {
-        return especie;
-    }
-
-    public void setEspecie(String especie) {
-        this.especie = especie;
-    }
-
     public String getRaca() {
         return raca;
     }
@@ -63,11 +71,13 @@ public class Pet {
         this.sexo = sexo;
     }
 
-    public Timestamp getDataNascimento() {
-        return dataNascimento;
-    }
-
-    public void setDataNascimento(Timestamp dataNascimento) {
+    public Pet(Timestamp dataNascimento, String especie, String fotoPerfil, String id, String nome, String raca, String sexo) {
         this.dataNascimento = dataNascimento;
+        this.especie = especie;
+        this.fotoPerfil = fotoPerfil;
+        this.id = id;
+        this.nome = nome;
+        this.raca = raca;
+        this.sexo = sexo;
     }
 }

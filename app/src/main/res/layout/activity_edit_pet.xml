@@ -51,7 +51,7 @@
         app:srcCompat="@drawable/upload"
         app:strokeColor="@color/md_theme_primary"
         app:strokeWidth="4dp"
-        app:tint="@color/md_theme_primary" />
+         />
 
     <TextView
         android:id="@+id/textAltere"

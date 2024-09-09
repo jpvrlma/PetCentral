@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 /**
@@ -106,7 +107,9 @@ public class CadastroActivity extends AppCompatActivity {
         mAuth.createUserWithEmailAndPassword(email, senha)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        Usuario user = new Usuario(nome, email);
+                        HashMap<String,Object> user = new HashMap<>();
+                        user.put("nome",nome);
+                        user.put("email",email);
                         FirebaseUser firebaseUser = mAuth.getCurrentUser();
                         if (firebaseUser != null) {
                             db.collection("usuarios").document(firebaseUser.getUid()).set(user);

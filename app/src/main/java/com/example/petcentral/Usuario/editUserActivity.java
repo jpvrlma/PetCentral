@@ -1,11 +1,16 @@
 package com.example.petcentral.Usuario;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -13,6 +18,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditUserBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -21,6 +27,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 
 import java.text.ParseException;
@@ -38,6 +46,8 @@ public class editUserActivity extends AppCompatActivity {
     private ActivityEditUserBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private Uri imageUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +82,10 @@ public class editUserActivity extends AppCompatActivity {
         binding.backButton.setOnClickListener(v -> finish());
 
         binding.editTextNome.setOnClickListener(v -> binding.textInputLayoutNome.setError(null));
+
+        binding.userFoto.setOnClickListener(v -> {
+            selecionarImagem();
+        });
     }
 
     //Carregar dados do usuário
@@ -111,6 +125,7 @@ public class editUserActivity extends AppCompatActivity {
             binding.autoCompleteSexo.setText(sexo, false);
             binding.editTextNascimento.setText(dataNascimento);
             atualizarUsuario(nome, sexo, dataNascimento);
+            UploadImagemFirebase(imageUri);
         }
     }
 
@@ -121,6 +136,34 @@ public class editUserActivity extends AppCompatActivity {
                 .addOnSuccessListener(unused -> mostrarSnackbar("Atualizado com sucesso"))
                 .addOnFailureListener(e -> mostrarSnackbar("Algo saiu mal"));
     }
+
+    // ------------------- Upload de imagens do usuario ------------------
+
+    private void selecionarImagem(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        imagePicker.launch(intent);
+    }
+
+    private ActivityResultLauncher<Intent> imagePicker = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                    if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
+                        imageUri = result.getData().getData();
+                        binding.userFoto.setImageURI(imageUri);
+                    }
+            });
+
+    private void UploadImagemFirebase(Uri imageUri){
+        if (imageUri != null){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil/" +  mAuth.getCurrentUser().getUid() + ".jpg");
+
+            storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                    String downloadUrl = uri.toString();
+                    db.collection("usuarios").document(mAuth.getCurrentUser().getUid()).update("fotoPerfil", downloadUrl);
+            }));
+        }
+    }
+
 
     // ------------------- Utilitários --------------------
     private void inicializarAutoCompleteTextViewLocal(MaterialAutoCompleteTextView autoCompleteTextView, int arrayResourceId) {

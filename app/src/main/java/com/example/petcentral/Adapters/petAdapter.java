@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 
+import com.bumptech.glide.Glide;
 import com.example.petcentral.Interfaces.PetInterface;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
@@ -62,6 +63,11 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
             holder.binding.textIdade.setText(idade);
         }
 
+        if (pet.getFotoPerfil() != null){
+            Glide.with(context)
+                    .load(pet.getFotoPerfil())
+                    .into(holder.binding.petImageView);
+        }
     }
 
     @Override

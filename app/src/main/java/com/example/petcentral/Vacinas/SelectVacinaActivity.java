@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.petcentral.Adapters.vacinaAdapter;
 import com.example.petcentral.Interfaces.OnSelectInterface;
 import com.example.petcentral.Objetos.Pet;
@@ -92,6 +93,14 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                             String idade = calcularIdadeFormatada(dataNascimento);
                             binding.textIdade.setText(idade);
                         }
+
+                        String urlFotoPerfil = pet.getFotoPerfil();
+                        if (urlFotoPerfil != null){
+                            Glide.with(this)
+                                    .load(urlFotoPerfil)
+                                    .into(binding.petImg);
+                        }
+
                         exibirVacinas();
                     }
                 });

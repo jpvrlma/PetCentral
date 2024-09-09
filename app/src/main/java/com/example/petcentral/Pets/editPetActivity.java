@@ -1,27 +1,34 @@
 package com.example.petcentral.Pets;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditPetBinding;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,6 +47,7 @@ public class editPetActivity extends AppCompatActivity {
     private MaterialAutoCompleteTextView autoCompleteEspecie, autoCompleteRaca, autoCompleteSexo;
     private final ArrayList<String> idEspecieSelecionados = new ArrayList<>();
     private final ArrayList<String> idRacaSelecionados = new ArrayList<>();
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +102,16 @@ public class editPetActivity extends AppCompatActivity {
     //Cliques
     private void clickListeners() {
         binding.editData.setOnClickListener(v -> startDatePicker());
+
         binding.btnSalvar.setOnClickListener(v -> validarCampos());
+
         binding.btnVoltar.setOnClickListener(v -> finish());
+
         binding.btnCancelar.setOnClickListener(v -> startActivity(new Intent(this, MainActivity.class)));
-        binding.btnExcluir.setOnClickListener(v -> verificarVacinasDoPetAntesDeDeletar());
+
+        binding.btnExcluir.setOnClickListener(v -> mostrarAlerta());
+
+        binding.btnUpload.setOnClickListener(v -> selecionarImagem());
 
     }
 
@@ -156,6 +170,7 @@ public class editPetActivity extends AppCompatActivity {
                             if (!autoCompleteEspecie.getText().toString().isEmpty()) {
                                 carregarRaca(autoCompleteRaca, idEspecie);
                             }
+
                             binding.main.setVisibility(View.VISIBLE);
                         }
                     } else {
@@ -202,6 +217,7 @@ public class editPetActivity extends AppCompatActivity {
         binding.autoCompleteSexo.setText(sexo, false);
         binding.editData.setText(dataNascimento);
         updatePet(nome, idEspecie, idRaca, sexo, dataNascimento);
+        UploadImagemFirebase(imageUri,idPet);
         startActivity(new Intent(this, MainActivity.class));
     }
 
@@ -213,6 +229,18 @@ public class editPetActivity extends AppCompatActivity {
     }
 
     // ------------- Metodos de exclusao de pets,vacinas e doses -----------------
+
+    private void mostrarAlerta(){
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Confirmação de exclusão")
+                .setMessage("Tem certeza que deseja excluir este pet?")
+                .setPositiveButton("Sim", (dialog, which) -> {
+                    verificarVacinasDoPetAntesDeDeletar();
+                }).setNegativeButton("Não", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
     private void verificarVacinasDoPetAntesDeDeletar() {
         String idUsuario = mAuth.getCurrentUser().getUid();
         db.collection("usuarios").document(idUsuario)
@@ -266,6 +294,33 @@ public class editPetActivity extends AppCompatActivity {
                 .collection("pets").document(idPet).delete().addOnSuccessListener(aVoid -> startActivity(new Intent(this, MainActivity.class)));
     }
 
+    // ------------------- UPLOAD DA IMAGEM -----------------------
+    private void selecionarImagem(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        imagePicker.launch(intent);
+    }
+
+    private final ActivityResultLauncher<Intent> imagePicker = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
+                    imageUri = result.getData().getData();
+                    binding.btnUpload.setImageURI(imageUri);
+                }
+            });
+
+    private void UploadImagemFirebase(Uri imageUri, String idPet){
+        if (imageUri != null){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil_pet/" +  idPet + ".jpg");
+
+            storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                String downloadUrl = uri.toString();
+                db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                        .collection("pets").document(idPet)
+                        .update("fotoPerfil", downloadUrl).addOnSuccessListener(aVoid -> startActivity(new Intent(editPetActivity.this, MainActivity.class)));
+            }));
+        }
+    }
 
     //-------------- Utilitários --------------
     private void mostrarSnackbar() {

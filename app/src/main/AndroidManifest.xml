@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:allowBackup="true"
@@ -37,9 +37,6 @@
             android:name=".Usuario.editUserActivity"
             android:exported="false" />
         <activity
-            android:name=".Usuario.SettingsActivity"
-            android:exported="false" />
-        <activity
             android:name=".Usuario.UserActivity"
             android:exported="false" />
         <activity
@@ -70,6 +67,7 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
     </application>
 
 </manifest>

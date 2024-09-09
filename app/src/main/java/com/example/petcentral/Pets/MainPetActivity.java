@@ -9,6 +9,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Vacinas.ViewVacinasActivity;
 import com.example.petcentral.databinding.ActivityMainPetBinding;
@@ -88,6 +89,13 @@ public class MainPetActivity extends AppCompatActivity {
                             Date dataNascimento = pet.getDataNascimento().toDate();
                             String idade = calcularIdadeFormatada(dataNascimento);
                             binding.textIdade.setText(idade);
+                        }
+                        String urlFotoPerfil = pet.getFotoPerfil();
+
+                        if (urlFotoPerfil != null){
+                            Glide.with(this)
+                                    .load(urlFotoPerfil)
+                                    .into(binding.petImg);
                         }
                     }
                 });

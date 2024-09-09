@@ -20,6 +20,7 @@ import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditarDoseBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.firebase.Timestamp;
@@ -83,7 +84,7 @@ public class EditarDoseActivity extends AppCompatActivity {
 
         binding.btnRegistrar.setOnClickListener(v -> validarCampos());
 
-        binding.btnExcluir.setOnClickListener(v -> mostrarAlertaParaExclusao());
+        binding.btnExcluir.setOnClickListener(v -> mostrarAlertaExclusao());
 
         binding.editTextDataAplicacao.setOnClickListener(v -> startDatePicker());
     }
@@ -212,12 +213,14 @@ public class EditarDoseActivity extends AppCompatActivity {
             limparDosesFuturas();
             pegarUltimaDataEAtualizarDosesFuturas();
             atualizarVacinaTimeline();
+            finish();
             return;
         }
         //Switch Aplicado
         verificarUltimaDoseAplicada(marca, lote, dataAplicacao, anotacoes, local, nomeVeterinario);
         atualizarDosesFuturas(numeroDose, dataAplicacaoTimestamp);
         verificarSeUltimaDoseEChamarGeracao();
+        finish();
     }
 
     // --------------------- EDIÇAO DE DOSES ----------------------
@@ -533,12 +536,15 @@ public class EditarDoseActivity extends AppCompatActivity {
                 });
     }
 
-    private void mostrarAlertaParaExclusao() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirmação de Exclusão")
-                .setMessage("Você tem certeza de que deseja excluir todas as doses e o registro dessa vacina? Essa ação não pode ser desfeita.")
-                .setPositiveButton("Excluir", (dialog, which) -> excluirTodasAsDosesEVacina())
-                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+    private void mostrarAlertaExclusao(){
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Confirmação de exclusão")
+                .setMessage("Tem certeza que deseja excluir esta dose? Todas as doses futuras aplicada também serão excluídas.")
+                .setPositiveButton("Sim", (dialog, which) -> {
+                    excluirTodasAsDosesEVacina();
+                }).setNegativeButton("Não", (dialog, which) -> {
+                    dialog.dismiss();
+                })
                 .show();
     }
 

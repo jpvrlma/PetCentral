@@ -37,7 +37,7 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/pet_img"
         android:layout_width="96dp"
         android:layout_height="96dp"
@@ -46,7 +46,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:srcCompat="@drawable/paw_solid"
-        app:tint="@color/md_theme_primary" />
+        app:shapeAppearanceOverlay="@style/PetShape"
+        />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

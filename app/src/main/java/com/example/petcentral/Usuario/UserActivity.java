@@ -10,6 +10,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.petcentral.Login.LoginActivity;
 import com.example.petcentral.databinding.ActivityUserBinding;
 import com.google.firebase.auth.FirebaseAuth;
@@ -78,6 +79,12 @@ public class UserActivity extends AppCompatActivity {
                             DocumentSnapshot documentSnapshot = value;
                             binding.textNome.setText(documentSnapshot.getString("nome"));
                             binding.textEmail.setText(documentSnapshot.getString("email"));
+                            String imageUrl = documentSnapshot.getString("fotoPerfil");
+                            if (imageUrl != null) {
+                                Glide.with(this)
+                                        .load(imageUrl)
+                                        .into(binding.userFoto);
+                            }
                         } else {
                             Log.d("Firestore", "Documento não encontrado.");
                         }

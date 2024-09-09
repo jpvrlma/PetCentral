@@ -1,6 +1,7 @@
 package com.example.petcentral.Pets;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
@@ -8,6 +9,8 @@ import com.example.petcentral.R;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -20,6 +23,8 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,6 +47,7 @@ public class CadastroPetActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String idEspecie, idRaca;
+    private Uri imageUri;
 
     private MaterialAutoCompleteTextView autoCompleteTextViewEspecie, autoCompleteTextViewRaca, autoCompleteTextViewSexo;
     private final ArrayList<String> idEspecieSelecionados = new ArrayList<>();
@@ -86,13 +92,18 @@ public class CadastroPetActivity extends AppCompatActivity {
     //Cliques
     private void clickListeners() {
         binding.btnCadastrar.setOnClickListener(v -> validarCampos());
+
         binding.editData.setOnClickListener(v -> startDatePicker());
+
         binding.btnVoltar.setOnClickListener(v -> finish());
+
+        binding.petAvatar.setOnClickListener(v -> selecionarImagem());
 
         binding.editNome.setOnClickListener(v -> binding.containerNome.setError(null));
         autoCompleteTextViewRaca.setOnClickListener(v -> binding.menuRaca.setError(null));
         autoCompleteTextViewSexo.setOnClickListener(v -> binding.containerSexo.setError(null));
     }
+
 
     // ---------------- Metodos para salvar no firebase ---------------------
     private void validarCampos() {
@@ -152,8 +163,13 @@ public class CadastroPetActivity extends AppCompatActivity {
         pet.put("sexo", sexo);
         pet.put("dataNascimento", timestamp);
 
-        db.collection("usuarios").document(mAuth.getCurrentUser().getUid()).collection("pets").add(pet);
-        startActivity(new Intent(CadastroPetActivity.this, MainActivity.class));
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid()).collection("pets").add(pet)
+                .addOnSuccessListener(documentReference -> {
+                    if (documentReference != null){
+                        String idPet = documentReference.getId();
+                        UploadImagemFirebase(imageUri, idPet);
+                    }
+                });
     }
 
     // ------------------ Carregamento de menus Dropdown -----------------------
@@ -183,6 +199,35 @@ public class CadastroPetActivity extends AppCompatActivity {
                     }
                 });
     }
+
+    // ------------------- UPLOAD DA IMAGEM -----------------------
+    private void selecionarImagem(){
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        imagePicker.launch(intent);
+    }
+
+    private final ActivityResultLauncher<Intent> imagePicker = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
+                    imageUri = result.getData().getData();
+                    binding.petAvatar.setImageURI(imageUri);
+                }
+            });
+
+    private void UploadImagemFirebase(Uri imageUri,String idPet){
+        if (imageUri != null){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil_pet/" +  idPet + ".jpg");
+
+            storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                String downloadUrl = uri.toString();
+                db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                        .collection("pets").document(idPet)
+                        .update("fotoPerfil", downloadUrl).addOnSuccessListener(aVoid -> startActivity(new Intent(CadastroPetActivity.this, MainActivity.class)));
+            }));
+        }
+    }
+
 
     //------------ Utilitários ------------
     private void startDatePicker() {
