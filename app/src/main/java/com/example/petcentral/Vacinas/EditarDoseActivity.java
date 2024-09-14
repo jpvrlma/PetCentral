@@ -198,6 +198,7 @@ public class EditarDoseActivity extends AppCompatActivity {
         }
         if (dataAplicacao.isEmpty()) {
             binding.InputLayoutDataAplicacao.setError("Campo obrigatório");
+            return;
         }
 
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
@@ -209,11 +210,7 @@ public class EditarDoseActivity extends AppCompatActivity {
 
         //Switch Nao aplicado
         if (!binding.switchAplicado.isChecked()) {
-            limparCamposVacina();
-            limparDosesFuturas();
-            pegarUltimaDataEAtualizarDosesFuturas();
-            atualizarVacinaTimeline();
-            finish();
+            mostrarAlertaEdicao();
             return;
         }
         //Switch Aplicado
@@ -534,6 +531,22 @@ public class EditarDoseActivity extends AppCompatActivity {
                         }
                     }
                 });
+    }
+
+    private void mostrarAlertaEdicao(){
+        new MaterialAlertDialogBuilder(this)
+                .setTitle("Confirmação de edição")
+                .setMessage("Tem certeza que deseja editar esta dose? Todas as doses futuras serão alteradas")
+                .setPositiveButton("Sim", (dialog, which) -> {
+                    limparCamposVacina();
+                    limparDosesFuturas();
+                    pegarUltimaDataEAtualizarDosesFuturas();
+                    atualizarVacinaTimeline();
+                    finish();
+                }).setNegativeButton("Não", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
     }
 
     private void mostrarAlertaExclusao(){

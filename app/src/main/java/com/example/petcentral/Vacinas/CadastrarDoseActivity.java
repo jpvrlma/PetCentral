@@ -140,6 +140,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         }
         if (dataAplicacao.isEmpty()) {
             binding.InputLayoutDataAplicacao.setError("Campo obrigatório");
+            return;
         }
 
         Timestamp dataAplicacaoTimestamp = converterParaTimestamp(dataAplicacao);
