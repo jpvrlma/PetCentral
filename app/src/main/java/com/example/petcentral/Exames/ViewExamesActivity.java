@@ -1,52 +1,54 @@
-package com.example.petcentral.Pets;
+package com.example.petcentral.Exames;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
-import com.example.petcentral.Exames.ViewExamesActivity;
 import com.example.petcentral.Objetos.Pet;
-import com.example.petcentral.Vacinas.ViewVacinasActivity;
-import com.example.petcentral.databinding.ActivityMainPetBinding;
+import com.example.petcentral.Pets.MainActivity;
+import com.example.petcentral.Pets.MainPetActivity;
+import com.example.petcentral.Pets.editPetActivity;
+import com.example.petcentral.R;
+import com.example.petcentral.databinding.ActivityEditPetBinding;
+import com.example.petcentral.databinding.ActivityViewExamesBinding;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Objects;
 import java.util.TimeZone;
 
-/**
- * Esta atividade irá exibir as informações do pet selecionado
- * e botoes para acesso de funcionalidades
- */
+public class ViewExamesActivity extends AppCompatActivity {
 
-public class MainPetActivity extends AppCompatActivity {
-
-    private ActivityMainPetBinding binding;
-    private FirebaseFirestore db;
+    private ActivityViewExamesBinding binding;
     private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-
-        binding = ActivityMainPetBinding.inflate(getLayoutInflater());
+        binding = ActivityViewExamesBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        db = FirebaseFirestore.getInstance();
         mAuth = FirebaseAuth.getInstance();
-        carregarDadosPet();
+        db = FirebaseFirestore.getInstance();
+
         clickListeners();
+        carregarDadosPet();
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -57,43 +59,39 @@ public class MainPetActivity extends AppCompatActivity {
     }
 
     //Cliques
-    private void clickListeners() {
+    private void clickListeners(){
         binding.btnVoltar.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            String idPet = getIntent().getStringExtra("idPet");
-            intent.putExtra("idPet", idPet);
+            Intent intent = new Intent(this, MainPetActivity.class);
             startActivity(intent);
         });
 
-        binding.cardVacina.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ViewVacinasActivity.class);
-            String idPet = getIntent().getStringExtra("idPet");
-            intent.putExtra("idPet", idPet);
+        binding.btnEdit.setOnClickListener(v ->{
+            Intent intent = new Intent(this, editPetActivity.class);
             startActivity(intent);
         });
 
-        binding.cardExames.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ViewExamesActivity.class);
-            String idPet = getIntent().getStringExtra("idPet");
-            intent.putExtra("idPet", idPet);
+        binding.btnCadastrar.setOnClickListener(v->{
+            Intent intent = new Intent(this, AdicionarExameActivity.class);
+            intent.putExtra("idPet", getIntent().getStringExtra("idPet"));
             startActivity(intent);
         });
-
-        binding.btnEdit.setOnClickListener(v -> onEditClick());
     }
 
-    //Carregar dados do pet
-    public void carregarDadosPet() {
+    //Carregamento de dados
+
+    private void carregarDadosPet(){
         String idPet = getIntent().getStringExtra("idPet");
-        db.collection("usuarios").document(Objects.requireNonNull(mAuth.getCurrentUser()).getUid())
-                .collection("pets").document(Objects.requireNonNull(idPet)).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .get().addOnSuccessListener(documentSnapshot -> {
+
+                    if (documentSnapshot.exists()){
                         Pet pet = documentSnapshot.toObject(Pet.class);
-                        binding.textNome.setText(Objects.requireNonNull(pet).getNome());
-                        binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
+                        binding.textNome.setText(pet.getNome());
+                        binding.textEspecie.setText(pet.getEspecie());
                         binding.textRaca.setText(pet.getRaca());
-                        if (pet.getDataNascimento() != null) {
+                        if (pet.getDataNascimento() != null){
                             Date dataNascimento = pet.getDataNascimento().toDate();
                             String idade = calcularIdadeFormatada(dataNascimento);
                             binding.textIdade.setText(idade);
@@ -106,15 +104,10 @@ public class MainPetActivity extends AppCompatActivity {
                                     .into(binding.petImg);
                         }
                     }
-                });
-    }
 
-    //Inicio para a atividade de editar pet
-    private void onEditClick() {
-        String idPet = getIntent().getStringExtra("idPet");
-        Intent intent = new Intent(this, editPetActivity.class);
-        intent.putExtra("idPet", idPet);
-        startActivity(intent);
+                }).addOnFailureListener(e -> {
+                    Log.e("Erro ao carregar ExamesActivity",e.getMessage());
+                });
     }
 
     // ------------------- Utilitários -------------------------
@@ -141,4 +134,5 @@ public class MainPetActivity extends AppCompatActivity {
         }
         return idadeFormatada.toString();
     }
+
 }

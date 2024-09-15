@@ -247,7 +247,6 @@
             android:text="Cancelar"
             android:textAllCaps="true"
             android:textStyle="bold"
-
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/guideline4"
             app:layout_constraintStart_toStartOf="parent"
