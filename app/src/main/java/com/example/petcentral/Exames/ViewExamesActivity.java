@@ -6,12 +6,18 @@ import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.petcentral.Adapters.viewExamesAdapter;
+import com.example.petcentral.Interfaces.OnSelectInterface;
+import com.example.petcentral.Objetos.Exames;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.Pets.MainPetActivity;
@@ -23,19 +29,26 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
-public class ViewExamesActivity extends AppCompatActivity {
+public class ViewExamesActivity extends AppCompatActivity implements OnSelectInterface {
 
     private ActivityViewExamesBinding binding;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private viewExamesAdapter exameAdapter;
+    private ArrayList<Exames> examesArrayList;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +63,17 @@ public class ViewExamesActivity extends AppCompatActivity {
         clickListeners();
         carregarDadosPet();
 
+        recyclerView = binding.recyclerView;
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        examesArrayList = new ArrayList<>();
+        exameAdapter = new viewExamesAdapter(this, this, examesArrayList);
+        recyclerView.setAdapter(exameAdapter);
+
+        exibirRecycler();
+
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.getRoot(), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -59,19 +83,20 @@ public class ViewExamesActivity extends AppCompatActivity {
     }
 
     //Cliques
-    private void clickListeners(){
+    private void clickListeners() {
         binding.btnVoltar.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainPetActivity.class);
             intent.putExtra("idPet", getIntent().getStringExtra("idPet"));
             startActivity(intent);
         });
 
-        binding.btnEdit.setOnClickListener(v ->{
+        binding.btnEdit.setOnClickListener(v -> {
             Intent intent = new Intent(this, editPetActivity.class);
+            intent.putExtra("idPet", getIntent().getStringExtra("idPet"));
             startActivity(intent);
         });
 
-        binding.btnCadastrar.setOnClickListener(v->{
+        binding.btnCadastrar.setOnClickListener(v -> {
             Intent intent = new Intent(this, AdicionarExameActivity.class);
             intent.putExtra("idPet", getIntent().getStringExtra("idPet"));
             startActivity(intent);
@@ -79,26 +104,26 @@ public class ViewExamesActivity extends AppCompatActivity {
     }
 
     //Carregamento de dados
-    private void carregarDadosPet(){
+    private void carregarDadosPet() {
         String idPet = getIntent().getStringExtra("idPet");
 
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
                 .get().addOnSuccessListener(documentSnapshot -> {
 
-                    if (documentSnapshot.exists()){
+                    if (documentSnapshot.exists()) {
                         Pet pet = documentSnapshot.toObject(Pet.class);
                         binding.textNome.setText(pet.getNome());
                         binding.textEspecie.setText(pet.getEspecie());
                         binding.textRaca.setText(pet.getRaca());
-                        if (pet.getDataNascimento() != null){
+                        if (pet.getDataNascimento() != null) {
                             Date dataNascimento = pet.getDataNascimento().toDate();
                             String idade = calcularIdadeFormatada(dataNascimento);
                             binding.textIdade.setText(idade);
                         }
                         String urlFotoPerfil = pet.getFotoPerfil();
 
-                        if (urlFotoPerfil != null){
+                        if (urlFotoPerfil != null) {
                             Glide.with(this)
                                     .load(urlFotoPerfil)
                                     .into(binding.petImg);
@@ -106,7 +131,28 @@ public class ViewExamesActivity extends AppCompatActivity {
                     }
 
                 }).addOnFailureListener(e -> {
-                    Log.e("Erro ao carregar ExamesActivity",e.getMessage());
+                    Log.e("Erro ao carregar ExamesActivity", e.getMessage());
+                });
+    }
+
+    //Recycler view
+    private void exibirRecycler() {
+        String idPet = getIntent().getStringExtra("idPet");
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet)
+                .collection("exames").addSnapshotListener((value, error) -> {
+                    if (error != null) {
+                        Log.e("ERRO FIRESTORE", error.getMessage());
+                        return;
+                    }
+                    examesArrayList.clear();
+                    for (DocumentSnapshot dc : value) {
+                        Exames exames = dc.toObject(Exames.class);
+                        exames.setId(dc.getId());
+                        examesArrayList.add(exames);
+                    }
+                    exameAdapter.notifyDataSetChanged();
                 });
     }
 
@@ -135,4 +181,8 @@ public class ViewExamesActivity extends AppCompatActivity {
         return idadeFormatada.toString();
     }
 
+    @Override
+    public void onSelectClick(int position) {
+
+    }
 }
