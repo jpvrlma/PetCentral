@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.0"
+androidPdfViewer = "2.8.2"
 firebaseBom = "33.1.2"
 glide = "4.16.0"
 junit = "4.13.2"
@@ -14,6 +15,7 @@ lifecycleLivedataKtx = "2.6.1"
 lifecycleViewmodelKtx = "2.6.1"
 
 [libraries]
+android-pdf-viewer = { module = "com.github.barteksc:android-pdf-viewer", version.ref = "androidPdfViewer" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }

@@ -5,9 +5,11 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.result.ActivityResultLauncher;
@@ -18,16 +20,34 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 
+import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityAdicionarExameBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
+import com.google.android.material.datepicker.DateValidatorPointForward;
+import com.google.android.material.datepicker.MaterialDatePicker;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.TimeZone;
 
 public class AdicionarExameActivity extends AppCompatActivity {
 
     private ActivityAdicionarExameBinding binding;
     private Uri fileUri;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +56,8 @@ public class AdicionarExameActivity extends AppCompatActivity {
         binding = ActivityAdicionarExameBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
 
         clickListeners();
 
@@ -61,17 +81,112 @@ public class AdicionarExameActivity extends AppCompatActivity {
             bottomSheetDialog.show();
 
             TextView tvPdf = view1.findViewById(R.id.tv_pdf);
+            TextView tvImagem = view1.findViewById(R.id.tv_img);
 
             tvPdf.setOnClickListener(v1 -> {
-                selecionarArquivo();
+                selecionarArquivoPDF();
+            });
+
+            tvImagem.setOnClickListener(v2 -> {
+                selecionarImagem();
             });
         });
+
+        binding.editNome.setOnClickListener(v -> {
+            binding.containerNome.setError(null);
+        });
+
+        binding.editTextDataAplicacao.setOnClickListener(v -> {
+            startDatePicker();
+        });
+
+        binding.btnRegistrar.setOnClickListener(v -> validarCampos());
     }
 
+    // Validações
+    private void validarCampos(){
+        String nome = binding.editNome.getText().toString().trim();
+        String data = binding.editTextDataAplicacao.getText().toString().trim();
+        String anotacoes = binding.editTextAnotacoes.getText().toString().trim();
 
-    private void selecionarArquivo(){
+        if (nome.isEmpty()){
+            binding.containerNome.setError("Campo obrigatório");
+            return;
+        }
+
+        if (data.isEmpty()){
+            binding.InputLayoutDataAplicacao.setError("Campo obrigatório");
+            return;
+        }
+
+        anotacoes = anotacoes.isEmpty() ? null : anotacoes;
+
+        salvarFirebase(nome,data,anotacoes);
+    }
+
+    //Salvar firebase
+    private void salvarFirebase(String nome, String data, String anotacoes){
+        String idPet = getIntent().getStringExtra("idPet");
+
+        Timestamp timestamp = converterParaTimestamp(data);
+
+        HashMap<String,Object> exame = new HashMap<>();
+
+        exame.put("nome", nome);
+        exame.put("data", timestamp);
+        exame.put("anotacoes", anotacoes);
+
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(idPet).collection("exames").add(exame)
+                .addOnSuccessListener(documentReference -> {
+                    uploadDeArquivoFirebase(fileUri);
+                });
+    }
+
+    //Upload de arquivos
+    private void uploadDeArquivoFirebase(Uri uri){
+        String idPet = getIntent().getStringExtra("idPet");
+        if (uri != null){
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("exames/" + idPet + "/" + fileUri.getLastPathSegment());
+
+            storageRef.putFile(uri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
+                Intent intent = new Intent(this, ViewExamesActivity.class);
+                intent.putExtra("idPet", idPet);
+                startActivity(intent);
+            }));
+        }
+    }
+
+    //Seleção de arquivos
+    private void selecionarImagem(){
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
+        intent.setType("image/*");
+        imagePicker.launch(intent);
+    }
+
+    private final ActivityResultLauncher<Intent> imagePicker = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
+                    fileUri = result.getData().getData();
+                    if (fileUri != null){
+                        String nome = getFileName(fileUri);
+                        binding.tvArquivosSelecionados.setText(nome);
+                        binding.tvArquivosSelecionados.setOnClickListener(v -> {
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            intent.setDataAndType(fileUri, "image/*");
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            startActivity(intent);
+                        });
+                    } else {
+                        Toast.makeText(this, "Nenhuma imagem selecionada", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+            });
+
+    private void selecionarArquivoPDF() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/pdf");
         filePicker.launch(intent);
     }
 
@@ -79,14 +194,23 @@ public class AdicionarExameActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
                     fileUri = result.getData().getData();
-
-                    if (fileUri != null){
-                       String nome = getFileName(fileUri);
-                       binding.tvArquivosSelecionados.setText(nome);
+                    if (fileUri != null) {
+                        String nome = getFileName(fileUri);
+                        binding.tvArquivosSelecionados.setText(nome);
+                        binding.tvArquivosSelecionados.setOnClickListener(v -> {
+                            if (fileUri != null) {
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setDataAndType(fileUri, "application/pdf");
+                                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                startActivity(intent);
+                            } else {
+                                Toast.makeText(this, "Nenhum arquivo PDF selecionado", Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 }
             });
-
+    //----------------- Utilitários -----------------
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
@@ -113,5 +237,36 @@ public class AdicionarExameActivity extends AppCompatActivity {
         return result;
     }
 
+    private Timestamp converterParaTimestamp(String dataStr) {
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+            Date parsedDate = dateFormat.parse(dataStr);
+            if (parsedDate != null) {
+                return new Timestamp(parsedDate);
+            } else {
+                return null;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void startDatePicker() {
+        binding.InputLayoutDataAplicacao.setError(null);
+        MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Selecione uma data")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setCalendarConstraints(new CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now()).build())
+                .build();
+        materialDatePicker.addOnPositiveButtonClickListener(selection -> {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+            dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String string = dateFormat.format(new Date(selection));
+            binding.editTextDataAplicacao.setText(string);
+        });
+        materialDatePicker.show(getSupportFragmentManager(), "TAG");
+    }
 }

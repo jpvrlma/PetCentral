@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
 import com.example.petcentral.R;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 
 import androidx.activity.EdgeToEdge;
@@ -235,6 +237,7 @@ public class CadastroPetActivity extends AppCompatActivity {
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setCalendarConstraints(new CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now()).build())
                 .build();
         materialDatePicker.addOnPositiveButtonClickListener(selection -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

@@ -19,6 +19,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditUserBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -183,6 +185,7 @@ public class editUserActivity extends AppCompatActivity {
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setCalendarConstraints(new CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now()).build())
                 .build();
         materialDatePicker.addOnPositiveButtonClickListener(selection -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");

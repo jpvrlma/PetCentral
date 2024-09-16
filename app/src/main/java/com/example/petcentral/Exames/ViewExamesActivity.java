@@ -62,6 +62,7 @@ public class ViewExamesActivity extends AppCompatActivity {
     private void clickListeners(){
         binding.btnVoltar.setOnClickListener(v -> {
             Intent intent = new Intent(this, MainPetActivity.class);
+            intent.putExtra("idPet", getIntent().getStringExtra("idPet"));
             startActivity(intent);
         });
 

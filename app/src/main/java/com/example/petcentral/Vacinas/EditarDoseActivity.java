@@ -19,6 +19,8 @@ import com.example.petcentral.Objetos.DoseVacina;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditarDoseBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.datepicker.CalendarConstraints;
+import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
@@ -613,6 +615,7 @@ public class EditarDoseActivity extends AppCompatActivity {
         MaterialDatePicker<Long> materialDatePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Selecione uma data")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .setCalendarConstraints(new CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now()).build())
                 .build();
         materialDatePicker.addOnPositiveButtonClickListener(selection -> {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
