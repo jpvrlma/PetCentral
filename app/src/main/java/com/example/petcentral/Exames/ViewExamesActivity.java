@@ -79,7 +79,6 @@ public class ViewExamesActivity extends AppCompatActivity {
     }
 
     //Carregamento de dados
-
     private void carregarDadosPet(){
         String idPet = getIntent().getStringExtra("idPet");
 

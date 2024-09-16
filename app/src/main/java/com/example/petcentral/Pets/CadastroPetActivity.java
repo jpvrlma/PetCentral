@@ -230,7 +230,6 @@ public class CadastroPetActivity extends AppCompatActivity {
         }
     }
 
-
     //------------ Utilitários ------------
     private void startDatePicker() {
         binding.containerData.setError(null);

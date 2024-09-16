@@ -139,20 +139,26 @@ public class AdicionarExameActivity extends AppCompatActivity {
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet).collection("exames").add(exame)
                 .addOnSuccessListener(documentReference -> {
-                    uploadDeArquivoFirebase(fileUri);
+                    String idExame = documentReference.getId();
+                    uploadDeArquivoFirebase(fileUri,idExame);
                 });
     }
 
     //Upload de arquivos
-    private void uploadDeArquivoFirebase(Uri uri){
+    private void uploadDeArquivoFirebase(Uri uri,String idExame){
         String idPet = getIntent().getStringExtra("idPet");
         if (uri != null){
             StorageReference storageRef = FirebaseStorage.getInstance().getReference("exames/" + idPet + "/" + fileUri.getLastPathSegment());
 
             storageRef.putFile(uri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
-                Intent intent = new Intent(this, ViewExamesActivity.class);
-                intent.putExtra("idPet", idPet);
-                startActivity(intent);
+                String downloadUrl = uri.toString();
+                db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                        .collection("pets").document(idPet).collection("exames").document(idExame)
+                        .update("arquivo", downloadUrl).addOnSuccessListener(aVoid -> {
+                            Intent intent = new Intent(this, ViewExamesActivity.class);
+                            intent.putExtra("idPet", idPet);
+                            startActivity(intent);
+                        });
             }));
         }
     }
