@@ -53,6 +53,15 @@ public class viewExamesAdapter extends RecyclerView.Adapter<viewExamesAdapter.Vi
         public ViewHolder(@NonNull RecyclerViewexamesBinding binding,OnSelectInterface selectInterface) {
             super(binding.getRoot());
             this.binding = binding;
+
+            binding.cardView.setOnClickListener(v -> {
+                if (selectInterface != null){
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION){
+                        selectInterface.onSelectClick(position);
+                    }
+                }
+            });
         }
     }
 

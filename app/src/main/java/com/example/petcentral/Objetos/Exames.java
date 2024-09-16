@@ -4,7 +4,7 @@ import com.google.firebase.Timestamp;
 
 public class Exames {
     private String id;
-    private String urlArquivo;
+    private String arquivo;
     private String nome;
     private Timestamp data;
     private String anotacoes;
@@ -19,6 +19,14 @@ public class Exames {
 
     public void setAnotacoes(String anotacoes) {
         this.anotacoes = anotacoes;
+    }
+
+    public String getArquivo() {
+        return arquivo;
+    }
+
+    public void setArquivo(String arquivo) {
+        this.arquivo = arquivo;
     }
 
     public Timestamp getData() {
@@ -45,19 +53,11 @@ public class Exames {
         this.nome = nome;
     }
 
-    public String getUrlArquivo() {
-        return urlArquivo;
-    }
-
-    public void setUrlArquivo(String urlArquivo) {
-        this.urlArquivo = urlArquivo;
-    }
-
-    public Exames(String anotacoes, Timestamp data, String id, String nome, String urlArquivo) {
+    public Exames(String anotacoes, String arquivo, Timestamp data, String id, String nome) {
         this.anotacoes = anotacoes;
+        this.arquivo = arquivo;
         this.data = data;
         this.id = id;
         this.nome = nome;
-        this.urlArquivo = urlArquivo;
     }
 }

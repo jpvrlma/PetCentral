@@ -183,6 +183,12 @@ public class ViewExamesActivity extends AppCompatActivity implements OnSelectInt
 
     @Override
     public void onSelectClick(int position) {
-
+            Exames exames = examesArrayList.get(position);
+            String idExame = exames.getId();
+            String idPet = getIntent().getStringExtra("idPet");
+            Intent intent = new Intent(this, EditExamesActivity.class);
+            intent.putExtra("idPet",idPet);
+            intent.putExtra("idExame",idExame);
+            startActivity(intent);
     }
 }
