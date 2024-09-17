@@ -1,5 +1,6 @@
 package com.example.petcentral.Exames;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -140,16 +141,22 @@ public class AdicionarExameActivity extends AppCompatActivity {
                 .collection("pets").document(idPet).collection("exames").add(exame)
                 .addOnSuccessListener(documentReference -> {
                     String idExame = documentReference.getId();
-                    uploadDeArquivoFirebase(fileUri,idExame);
+                    uploadDeArquivoFirebase(fileUri,idExame,nome);
                 });
     }
 
     //Upload de arquivos
-    private void uploadDeArquivoFirebase(Uri uri,String idExame){
+    private void uploadDeArquivoFirebase(Uri uri,String idExame,String nome){
         String idPet = getIntent().getStringExtra("idPet");
         String extensao = getFileExtension(fileUri);
+
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Carregando...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         if (uri != null){
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("exames/" + idPet + "/" + fileUri.getLastPathSegment() + extensao );
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("exames/" + idPet + "/" + nome + extensao );
 
             storageRef.putFile(uri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(downloadUri  -> {
                 String downloadUrl = downloadUri.toString();
@@ -158,6 +165,7 @@ public class AdicionarExameActivity extends AppCompatActivity {
                         .update("arquivo", downloadUrl).addOnSuccessListener(aVoid -> {
                             Intent intent = new Intent(this, ViewExamesActivity.class);
                             intent.putExtra("idPet", idPet);
+                            progressDialog.dismiss();
                             startActivity(intent);
                         });
             }));

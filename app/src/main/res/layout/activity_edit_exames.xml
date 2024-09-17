@@ -150,10 +150,10 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline7"
-            app:layout_constraintTop_toBottomOf="@+id/btn_add" />
+            app:layout_constraintTop_toBottomOf="@+id/tvArquivosSelecionados" />
 
         <Button
-            android:id="@+id/btn_cancelar"
+            android:id="@+id/btn_excluir"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="0dp"
             android:layout_height="60dp"
@@ -165,24 +165,6 @@
             android:textAllCaps="true"
             android:textStyle="bold"
             app:layout_constraintEnd_toStartOf="@+id/guideline7"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_add" />
-
-        <Button
-            android:id="@+id/btn_add"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:backgroundTint="@color/md_theme_background"
-            android:text="Alterar arquivo"
-            android:textAllCaps="true"
-            android:textColor="@color/md_theme_onBackground"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvArquivosSelecionados" />
 

@@ -2,6 +2,7 @@ package com.example.petcentral.Vacinas;
 
 import static android.content.ContentValues.TAG;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -567,6 +568,11 @@ public class EditarDoseActivity extends AppCompatActivity {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
 
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Carregando...");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
                 .collection("vacinas").document(idVacina)
@@ -582,6 +588,7 @@ public class EditarDoseActivity extends AppCompatActivity {
                                 Intent intent = new Intent(EditarDoseActivity.this, ViewVacinasActivity.class);
                                 intent.putExtra("idPet", idPet);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                progressDialog.dismiss();
                                 startActivity(intent);
                                 finish();
                             });
