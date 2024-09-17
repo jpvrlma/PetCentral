@@ -1,5 +1,6 @@
 package com.example.petcentral.Exames;
 
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -56,6 +57,8 @@ public class EditExamesActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+
     }
 
     //Cliques
@@ -67,7 +70,6 @@ public class EditExamesActivity extends AppCompatActivity {
         });
     }
 
-    //Carregar dados para edição
 
     // Carregar dados do exame e exibir o nome do arquivo
     private void carregarDadosExame(){
@@ -106,34 +108,54 @@ public class EditExamesActivity extends AppCompatActivity {
                 });
     }
 
-
-
     //Utilitarios
     private String getFileNameFromUrl(String fileUrl) {
         if (fileUrl != null) {
-            int index = fileUrl.lastIndexOf('/');
-            if (index != -1) {
+            String decodedUrl = Uri.decode(fileUrl);
 
-                String fileNameWithExtension = fileUrl.substring(index + 1).split("\\?")[0];
+            String path = decodedUrl.substring(decodedUrl.lastIndexOf('/') + 1);
 
-                return fileNameWithExtension;
+            int queryIndex = path.indexOf('?');
+            if (queryIndex != -1) {
+                path = path.substring(0, queryIndex);
             }
+
+            return path;
         }
         return "Arquivo";
     }
 
-    private void abrirArquivo(String fileUrl) {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse(fileUrl), "*/*");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-
-        Intent chooser = Intent.createChooser(intent, "Abrir arquivo com");
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(chooser);
-        } else {
-            Toast.makeText(this, "Nenhum aplicativo disponível para abrir este arquivo", Toast.LENGTH_SHORT).show();
+    private String getMimeTypeFromExtension(String extension) {
+        switch (extension) {
+            case "pdf":
+                return "application/pdf";
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "png":
+                return "image/png";
+            default:
+                return "*/*";
         }
     }
+
+
+    private void abrirArquivo(String fileUrl) {
+        String decodedUrl = Uri.decode(fileUrl);
+
+        String extension = decodedUrl.substring(decodedUrl.lastIndexOf('.') + 1).split("\\?")[0];
+        System.out.println(extension);
+
+        String mimeType = getMimeTypeFromExtension(extension);
+        System.out.println(mimeType);
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(Uri.parse(fileUrl), mimeType);
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // Permissão para ler o arquivo
+        startActivity(intent);
+    }
+
+
 
     private Timestamp converterParaTimestamp(String dataStr) {
         try {

@@ -147,11 +147,12 @@ public class AdicionarExameActivity extends AppCompatActivity {
     //Upload de arquivos
     private void uploadDeArquivoFirebase(Uri uri,String idExame){
         String idPet = getIntent().getStringExtra("idPet");
+        String extensao = getFileExtension(fileUri);
         if (uri != null){
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("exames/" + idPet + "/" + fileUri.getLastPathSegment());
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("exames/" + idPet + "/" + fileUri.getLastPathSegment() + extensao );
 
-            storageRef.putFile(uri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri1 -> {
-                String downloadUrl = uri.toString();
+            storageRef.putFile(uri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(downloadUri  -> {
+                String downloadUrl = downloadUri.toString();
                 db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                         .collection("pets").document(idPet).collection("exames").document(idExame)
                         .update("arquivo", downloadUrl).addOnSuccessListener(aVoid -> {
@@ -242,6 +243,19 @@ public class AdicionarExameActivity extends AppCompatActivity {
         }
         return result;
     }
+
+    private String getFileExtension(Uri uri) {
+        String fileType = getContentResolver().getType(uri);
+        if (fileType != null) {
+            if (fileType.equals("application/pdf")) {
+                return ".pdf";
+            } else if (fileType.startsWith("image/")) {
+                return ".jpg";
+            }
+        }
+        return "";
+    }
+
 
     private Timestamp converterParaTimestamp(String dataStr) {
         try {
