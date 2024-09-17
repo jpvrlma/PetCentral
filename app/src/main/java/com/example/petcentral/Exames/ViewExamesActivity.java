@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -19,21 +17,13 @@ import com.example.petcentral.Adapters.viewExamesAdapter;
 import com.example.petcentral.Interfaces.OnSelectInterface;
 import com.example.petcentral.Objetos.Exames;
 import com.example.petcentral.Objetos.Pet;
-import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.Pets.MainPetActivity;
 import com.example.petcentral.Pets.editPetActivity;
-import com.example.petcentral.R;
-import com.example.petcentral.databinding.ActivityEditPetBinding;
 import com.example.petcentral.databinding.ActivityViewExamesBinding;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
+
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -130,9 +120,7 @@ public class ViewExamesActivity extends AppCompatActivity implements OnSelectInt
                         }
                     }
 
-                }).addOnFailureListener(e -> {
-                    Log.e("Erro ao carregar ExamesActivity", e.getMessage());
-                });
+                }).addOnFailureListener(e -> Log.e("Erro ao carregar ExamesActivity", e.getMessage()));
     }
 
     //Recycler view

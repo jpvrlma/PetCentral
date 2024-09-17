@@ -1,39 +1,25 @@
 package com.example.petcentral.Exames;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.petcentral.Objetos.Exames;
-import com.example.petcentral.R;
-import com.example.petcentral.Vacinas.EditarDoseActivity;
-import com.example.petcentral.Vacinas.ViewVacinasActivity;
 import com.example.petcentral.databinding.ActivityEditExamesBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -41,7 +27,6 @@ import com.google.firebase.storage.StorageReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.TimeZone;
 
 public class EditExamesActivity extends AppCompatActivity {
@@ -84,9 +69,7 @@ public class EditExamesActivity extends AppCompatActivity {
 
         binding.btnRegistrar.setOnClickListener(v -> validarCampos());
 
-        binding.editTextDataAplicacao.setOnClickListener(v -> {
-            startDatePicker();
-        });
+        binding.editTextDataAplicacao.setOnClickListener(v -> startDatePicker());
 
         binding.btnExcluir.setOnClickListener(v -> mostrarAlertaExclusao());
     }
@@ -141,11 +124,7 @@ public class EditExamesActivity extends AppCompatActivity {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Confirmação de exclusão")
                 .setMessage("Tem certeza que deseja excluir este exame?")
-                .setPositiveButton("Sim", (dialog, which) -> {
-                    excluirExame();
-                }).setNegativeButton("Não", (dialog, which) -> {
-                    dialog.dismiss();
-                })
+                .setPositiveButton("Sim", (dialog, which) -> excluirExame()).setNegativeButton("Não", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
@@ -180,9 +159,7 @@ public class EditExamesActivity extends AppCompatActivity {
                                     progressDialog.dismiss();
                                     finish();
                                 })
-                                .addOnFailureListener(e -> {
-                                    Toast.makeText(this, "Erro ao excluir exame: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                                });
+                                .addOnFailureListener(e -> Toast.makeText(this, "Erro ao excluir exame: " + e.getMessage(), Toast.LENGTH_SHORT).show());
                     }
                 });
     }
@@ -190,11 +167,7 @@ public class EditExamesActivity extends AppCompatActivity {
     private void excluirArquivoNoStorage(String fileUrl) {
         StorageReference fileRef = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
 
-        fileRef.delete().addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Arquivo excluído com sucesso", Toast.LENGTH_SHORT).show();
-        }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Erro ao excluir arquivo: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        });
+        fileRef.delete().addOnSuccessListener(aVoid -> Toast.makeText(this, "Arquivo excluído com sucesso", Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(this, "Erro ao excluir arquivo: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     // Carregar dados do exame e exibir o nome do arquivo
@@ -225,9 +198,7 @@ public class EditExamesActivity extends AppCompatActivity {
                                 String fileName = getFileNameFromUrl(fileUrl);
                                 binding.tvArquivosSelecionados.setText(fileName);
 
-                                binding.tvArquivosSelecionados.setOnClickListener(v -> {
-                                    abrirArquivo(fileUrl);
-                                });
+                                binding.tvArquivosSelecionados.setOnClickListener(v -> abrirArquivo(fileUrl));
                             }
                         }
                     }

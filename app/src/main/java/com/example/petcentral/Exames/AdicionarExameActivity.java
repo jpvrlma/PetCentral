@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.OpenableColumns;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -21,18 +20,14 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 
-import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityAdicionarExameBinding;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
-import com.google.android.material.datepicker.DateValidatorPointForward;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -84,22 +79,14 @@ public class AdicionarExameActivity extends AppCompatActivity {
             TextView tvPdf = view1.findViewById(R.id.tv_pdf);
             TextView tvImagem = view1.findViewById(R.id.tv_img);
 
-            tvPdf.setOnClickListener(v1 -> {
-                selecionarArquivoPDF();
-            });
+            tvPdf.setOnClickListener(v1 -> selecionarArquivoPDF());
 
-            tvImagem.setOnClickListener(v2 -> {
-                selecionarImagem();
-            });
+            tvImagem.setOnClickListener(v2 -> selecionarImagem());
         });
 
-        binding.editNome.setOnClickListener(v -> {
-            binding.containerNome.setError(null);
-        });
+        binding.editNome.setOnClickListener(v -> binding.containerNome.setError(null));
 
-        binding.editTextDataAplicacao.setOnClickListener(v -> {
-            startDatePicker();
-        });
+        binding.editTextDataAplicacao.setOnClickListener(v -> startDatePicker());
 
         binding.btnRegistrar.setOnClickListener(v -> validarCampos());
     }
@@ -229,16 +216,12 @@ public class AdicionarExameActivity extends AppCompatActivity {
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            try {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
                     if (index >= 0) {
                         result = cursor.getString(index);
-                    }}
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
+                    }
                 }
             }
         }

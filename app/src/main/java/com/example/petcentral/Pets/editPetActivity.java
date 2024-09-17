@@ -1,5 +1,6 @@
 package com.example.petcentral.Pets;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditPetBinding;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.datepicker.MaterialDatePicker;
@@ -218,16 +220,19 @@ public class editPetActivity extends AppCompatActivity {
         binding.autoCompleteRaca.setText(raca, false);
         binding.autoCompleteSexo.setText(sexo, false);
         binding.editData.setText(dataNascimento);
+
         updatePet(nome, idEspecie, idRaca, sexo, dataNascimento);
-        UploadImagemFirebase(imageUri,idPet);
-        startActivity(new Intent(this, MainActivity.class));
+
     }
 
     private void updatePet(String nome, String idEspecie, String idRaca, String sexo, String dataNascimento) {
         Timestamp timestamp = converterParaTimestamp(dataNascimento);
         db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                 .collection("pets").document(idPet)
-                .update("nome", nome, "especie", idEspecie, "raca", idRaca, "sexo", sexo, "dataNascimento", timestamp);
+                .update("nome", nome, "especie", idEspecie, "raca", idRaca, "sexo", sexo, "dataNascimento", timestamp)
+                .addOnSuccessListener(unused -> {
+                    UploadImagemFirebase(imageUri,idPet);
+                });
     }
 
     // ------------- Metodos de exclusao de pets,vacinas e doses -----------------
@@ -315,13 +320,41 @@ public class editPetActivity extends AppCompatActivity {
         if (imageUri != null){
             StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil_pet/" +  idPet + ".jpg");
 
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Carregando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
             storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                 String downloadUrl = uri.toString();
                 db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                         .collection("pets").document(idPet)
-                        .update("fotoPerfil", downloadUrl).addOnSuccessListener(aVoid -> startActivity(new Intent(editPetActivity.this, MainActivity.class)));
+                        .update("fotoPerfil", downloadUrl).addOnSuccessListener(aVoid -> startActivity(new Intent(editPetActivity.this, MainActivity.class)))
+                        .addOnSuccessListener(unused -> {
+                            progressDialog.dismiss();
+                            limparCampos();
+                            startActivity(new Intent(editPetActivity.this, MainActivity.class));
+                        });
             }));
+        } else {
+            startActivity(new Intent(editPetActivity.this, MainActivity.class));
         }
+    }
+
+    private void limparCampos() {
+        binding.editNome.setText("");
+        binding.editData.setText("");
+        autoCompleteEspecie.setText("", false);
+        autoCompleteRaca.setText("", false);
+        autoCompleteSexo.setText("", false);
+
+        idEspecie = null;
+        idRaca = null;
+        imageUri = null;
+
+        autoCompleteRaca.setEnabled(false);
+
+        binding.btnUpload.setImageResource(R.drawable.paw_solid);
     }
 
     //-------------- Utilitários --------------

@@ -1,5 +1,6 @@
 package com.example.petcentral.Usuario;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.petcentral.Pets.CadastroPetActivity;
+import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditUserBinding;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -127,7 +130,6 @@ public class editUserActivity extends AppCompatActivity {
             binding.autoCompleteSexo.setText(sexo, false);
             binding.editTextNascimento.setText(dataNascimento);
             atualizarUsuario(nome, sexo, dataNascimento);
-            UploadImagemFirebase(imageUri);
         }
     }
 
@@ -135,8 +137,20 @@ public class editUserActivity extends AppCompatActivity {
         Timestamp timestamp = converterParaTimestamp(dataNascimento);
         db.collection("usuarios").document(Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid())
                 .update("nome", nome, "sexo", sexo, "dataNascimento", timestamp)
-                .addOnSuccessListener(unused -> mostrarSnackbar("Atualizado com sucesso"))
+                .addOnSuccessListener(unused -> {
+                    UploadImagemFirebase(imageUri);
+                })
                 .addOnFailureListener(e -> mostrarSnackbar("Algo saiu mal"));
+    }
+
+    private void limparCampos(){
+        binding.editTextNome.setText("");
+        binding.autoCompleteSexo.setText("");
+        binding.editTextNascimento.setText("");
+
+        imageUri = null;
+
+        binding.userFoto.setImageResource(R.drawable.generic_avatar);
     }
 
     // ------------------- Upload de imagens do usuario ------------------
@@ -159,10 +173,20 @@ public class editUserActivity extends AppCompatActivity {
         if (imageUri != null){
             StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil/" +  mAuth.getCurrentUser().getUid() + ".jpg");
 
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Carregando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
             storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                     String downloadUrl = uri.toString();
                     db.collection("usuarios").document(mAuth.getCurrentUser().getUid()).update("fotoPerfil", downloadUrl);
+                    progressDialog.dismiss();
+                     limparCampos();
+                     startActivity(new Intent(editUserActivity.this, UserActivity.class));
             }));
+        } else {
+            startActivity(new Intent(editUserActivity.this, UserActivity.class));
         }
     }
 

@@ -1,11 +1,13 @@
 package com.example.petcentral.Pets;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 
 import com.example.petcentral.R;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.DateValidatorPointBackward;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
@@ -169,7 +171,13 @@ public class CadastroPetActivity extends AppCompatActivity {
                 .addOnSuccessListener(documentReference -> {
                     if (documentReference != null){
                         String idPet = documentReference.getId();
-                        UploadImagemFirebase(imageUri, idPet);
+                        if (imageUri != null){
+                            UploadImagemFirebase(imageUri, idPet);
+                        } else {
+                            limparCampos();
+                            startActivity(new Intent(CadastroPetActivity.this, MainActivity.class));
+                        }
+
                     }
                 });
     }
@@ -221,14 +229,39 @@ public class CadastroPetActivity extends AppCompatActivity {
         if (imageUri != null){
             StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil_pet/" +  idPet + ".jpg");
 
+            ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setMessage("Carregando...");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+
             storageRef.putFile(imageUri).addOnSuccessListener(taskSnapshot -> storageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                 String downloadUrl = uri.toString();
                 db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                         .collection("pets").document(idPet)
-                        .update("fotoPerfil", downloadUrl).addOnSuccessListener(aVoid -> startActivity(new Intent(CadastroPetActivity.this, MainActivity.class)));
+                        .update("fotoPerfil", downloadUrl).addOnSuccessListener(unused -> {
+                            progressDialog.dismiss();
+                            startActivity(new Intent(CadastroPetActivity.this, MainActivity.class));
+                        });
             }));
         }
     }
+
+    private void limparCampos() {
+        binding.editNome.setText("");
+        binding.editData.setText("");
+        autoCompleteTextViewEspecie.setText("", false);
+        autoCompleteTextViewRaca.setText("", false);
+        autoCompleteTextViewSexo.setText("", false);
+
+        idEspecie = null;
+        idRaca = null;
+        imageUri = null;
+
+        autoCompleteTextViewRaca.setEnabled(false);
+
+        binding.petAvatar.setImageResource(R.drawable.paw_solid);
+    }
+
 
     //------------ Utilitários ------------
     private void startDatePicker() {

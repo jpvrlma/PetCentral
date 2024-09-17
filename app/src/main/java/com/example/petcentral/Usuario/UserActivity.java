@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.petcentral.Login.LoginActivity;
+import com.example.petcentral.Pets.MainActivity;
 import com.example.petcentral.databinding.ActivityUserBinding;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -56,7 +57,10 @@ public class UserActivity extends AppCompatActivity {
 
         binding.cardLogout.setOnClickListener(v -> logout());
 
-        binding.btnBack.setOnClickListener(v -> finish());
+        binding.btnBack.setOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        });
     }
 
     //Logout

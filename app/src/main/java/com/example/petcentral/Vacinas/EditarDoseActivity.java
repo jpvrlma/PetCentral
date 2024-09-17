@@ -555,7 +555,7 @@ public class EditarDoseActivity extends AppCompatActivity {
     private void mostrarAlertaExclusao(){
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Confirmação de exclusão")
-                .setMessage("Tem certeza que deseja excluir esta dose? Todas as doses futuras aplicada também serão excluídas.")
+                .setMessage("Tem certeza que deseja excluir esta dose? Todas as doses futuras aplicadas também serão excluídas.")
                 .setPositiveButton("Sim", (dialog, which) -> {
                     excluirTodasAsDosesEVacina();
                 }).setNegativeButton("Não", (dialog, which) -> {

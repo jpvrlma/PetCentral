@@ -67,6 +67,8 @@ public class petAdapter extends RecyclerView.Adapter<petAdapter.ViewHolder> {
             Glide.with(context)
                     .load(pet.getFotoPerfil())
                     .into(holder.binding.petImageView);
+        } else {
+            holder.binding.petImageView.setImageResource(R.drawable.paw_solid);
         }
     }
 
