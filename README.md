@@ -18,4 +18,4 @@
 
 ## Documento de Software
 
-O documento detalhado de especificação e arquitetura do software pode ser baixado [aqui] (https://drive.google.com/file/d/1K6eCJ61taqhKR6QSNet1NaNpkfYyoPfR/view?usp=sharing). Este documento contém uma visão técnica sobre o design do aplicativo, fluxos de dados e outros detalhes importantes.
+O documento detalhado de especificação e arquitetura do software pode ser baixado [aqui](https://drive.google.com/file/d/1K6eCJ61taqhKR6QSNet1NaNpkfYyoPfR/view?usp=sharing). Este documento contém uma visão técnica sobre o design do aplicativo, fluxos de dados e outros detalhes importantes.
