@@ -1,11 +1,16 @@
 package com.example.petcentral.Exames;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
@@ -62,6 +67,7 @@ public class AdicionarExameActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
     }
 
     //Cliques
@@ -161,19 +167,19 @@ public class AdicionarExameActivity extends AppCompatActivity {
 
     //Seleção de arquivos
     private void selecionarImagem(){
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        imagePicker.launch(intent);
+            Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            imagePicker.launch(intent);
     }
 
     private final ActivityResultLauncher<Intent> imagePicker = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == AppCompatActivity.RESULT_OK && result.getData() != null) {
                     fileUri = result.getData().getData();
-                    if (fileUri != null){
+                    if (fileUri != null) {
                         String nome = getFileName(fileUri);
                         binding.tvArquivosSelecionados.setText(nome);
                         binding.tvArquivosSelecionados.setOnClickListener(v -> {
+                            Log.d("ImagePicker", "Clique no arquivo selecionado: " + fileUri);
                             Intent intent = new Intent(Intent.ACTION_VIEW);
                             intent.setDataAndType(fileUri, "image/*");
                             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
@@ -182,9 +188,9 @@ public class AdicionarExameActivity extends AppCompatActivity {
                     } else {
                         Toast.makeText(this, "Nenhuma imagem selecionada", Toast.LENGTH_SHORT).show();
                     }
-
                 }
             });
+
 
     private void selecionarArquivoPDF() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);

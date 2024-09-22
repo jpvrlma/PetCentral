@@ -166,7 +166,6 @@ public class EditExamesActivity extends AppCompatActivity {
 
     private void excluirArquivoNoStorage(String fileUrl) {
         StorageReference fileRef = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
-
         fileRef.delete().addOnSuccessListener(aVoid -> Toast.makeText(this, "Arquivo excluído com sucesso", Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(this, "Erro ao excluir arquivo: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 

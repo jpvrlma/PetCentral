@@ -17,6 +17,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.bumptech.glide.Glide;
+import com.example.petcentral.Exames.EditExamesActivity;
+import com.example.petcentral.Exames.ViewExamesActivity;
 import com.example.petcentral.Objetos.Pet;
 import com.example.petcentral.R;
 import com.example.petcentral.databinding.ActivityEditPetBinding;
@@ -231,13 +233,13 @@ public class editPetActivity extends AppCompatActivity {
                 .collection("pets").document(idPet)
                 .update("nome", nome, "especie", idEspecie, "raca", idRaca, "sexo", sexo, "dataNascimento", timestamp)
                 .addOnSuccessListener(unused -> {
-                    UploadImagemFirebase(imageUri,idPet);
+                    UploadImagemFirebase(imageUri, idPet);
                 });
     }
 
     // ------------- Metodos de exclusao de pets,vacinas e doses -----------------
 
-    private void mostrarAlerta(){
+    private void mostrarAlerta() {
         new MaterialAlertDialogBuilder(this)
                 .setTitle("Confirmação de exclusão")
                 .setMessage("Tem certeza que deseja excluir este pet?")
@@ -248,6 +250,7 @@ public class editPetActivity extends AppCompatActivity {
                 })
                 .show();
     }
+
     private void verificarVacinasDoPetAntesDeDeletar() {
         String idUsuario = mAuth.getCurrentUser().getUid();
         db.collection("usuarios").document(idUsuario)
@@ -290,19 +293,72 @@ public class editPetActivity extends AppCompatActivity {
                 .collection("pets").document(idPet)
                 .collection("vacinas").get().addOnSuccessListener(vacinasSnapshot -> {
                     if (vacinasSnapshot == null || vacinasSnapshot.isEmpty()) {
+                        deletarExames();
+                    }
+                });
+    }
+
+    private void deletarExames() {
+        String idUsuario = mAuth.getCurrentUser().getUid();
+        db.collection("usuarios").document(idUsuario)
+                .collection("pets").document(idPet)
+                .collection("exames").get().addOnSuccessListener(examesSnapshot -> {
+                    if (examesSnapshot != null && !examesSnapshot.isEmpty()) {
+                        for (DocumentSnapshot exameDoc : examesSnapshot.getDocuments()) {
+                            String url = exameDoc.getString("arquivo");
+                            excluirArquivoNoStorage(url);
+                            exameDoc.getReference().delete();
+                        }
+                        verificarSeAindaHaExames();
+                    } else {
                         deletarPet();
                     }
                 });
     }
 
+    private void verificarSeAindaHaExames() {
+        String idUsuario = mAuth.getCurrentUser().getUid();
+        db.collection("usuarios").document(idUsuario)
+                .collection("pets").document(idPet)
+                .collection("exames").get()
+                .addOnSuccessListener(examesSnapshot -> {
+                    if (examesSnapshot == null || examesSnapshot.isEmpty()) {
+                        deletarPet();
+                    }
+                });
+    }
+
+
+    private void excluirArquivoNoStorage(String fileUrl) {
+        StorageReference fileRef = FirebaseStorage.getInstance().getReferenceFromUrl(fileUrl);
+        fileRef.delete().addOnSuccessListener(aVoid -> Toast.makeText(this, "Arquivo excluído com sucesso", Toast.LENGTH_SHORT).show()).addOnFailureListener(e -> Toast.makeText(this, "Erro ao excluir arquivo: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+    }
+
     private void deletarPet() {
         String idUsuario = mAuth.getCurrentUser().getUid();
         db.collection("usuarios").document(idUsuario)
-                .collection("pets").document(idPet).delete().addOnSuccessListener(aVoid -> startActivity(new Intent(this, MainActivity.class)));
+                .collection("pets").document(idPet)
+                .get().addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        String fileUrl = documentSnapshot.getString("fotoPerfil");
+
+                        if (fileUrl != null && !fileUrl.isEmpty()) {
+                            excluirArquivoNoStorage(fileUrl);
+                        }
+                        documentSnapshot.getReference().delete();
+                        Intent intent = new Intent(editPetActivity.this, ViewExamesActivity.class);
+                        intent.putExtra("idPet", idPet);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        finish();
+
+                    }
+
+                });
     }
 
+
     // ------------------- UPLOAD DA IMAGEM -----------------------
-    private void selecionarImagem(){
+    private void selecionarImagem() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         imagePicker.launch(intent);
@@ -316,9 +372,9 @@ public class editPetActivity extends AppCompatActivity {
                 }
             });
 
-    private void UploadImagemFirebase(Uri imageUri, String idPet){
-        if (imageUri != null){
-            StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil_pet/" +  idPet + ".jpg");
+    private void UploadImagemFirebase(Uri imageUri, String idPet) {
+        if (imageUri != null) {
+            StorageReference storageRef = FirebaseStorage.getInstance().getReference("fotos_de_perfil_pet/" + idPet + ".jpg");
 
             ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setMessage("Carregando...");
