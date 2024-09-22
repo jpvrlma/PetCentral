@@ -1,6 +1,6 @@
 # Aplicativo de rastreamento de vacinação animal
 
-## Este projeto tem como objetivo a criação de um aplicativo especializado no rastreamento de vacinação animal, oferecendo uma plataforma para que os usuários possam acessar registros centralizados de todos os animais sob seus cuidados, recebam alertas de vacinação e possam verificar o histórico de cada animal.
+## Este projeto tem como objetivo a criação de um aplicativo especializado no rastreamento de vacinação animal, oferecendo uma plataforma para que os usuários possam acessar registros centralizados de todos os animais sob seus cuidados e que possam verificar o histórico de cada animal.
 
 ## Funcionalidades
 
