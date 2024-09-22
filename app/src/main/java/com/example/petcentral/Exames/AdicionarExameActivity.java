@@ -218,6 +218,7 @@ public class AdicionarExameActivity extends AppCompatActivity {
                     }
                 }
             });
+
     //----------------- Utilitários -----------------
     public String getFileName(Uri uri) {
         String result = null;

@@ -2,6 +2,7 @@
 agp = "8.5.0"
 androidPdfViewer = "2.8.2"
 firebaseBom = "33.1.2"
+firebaseMessaging = "24.0.1"
 glide = "4.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -19,6 +20,7 @@ android-pdf-viewer = { module = "com.github.barteksc:android-pdf-viewer", versio
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
+firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
 firebase-storage = { module = "com.google.firebase:firebase-storage" }
 glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

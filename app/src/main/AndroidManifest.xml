@@ -15,6 +15,15 @@
         android:theme="@style/AppTheme"
         tools:targetApi="31">
         <activity
+            android:name=".Alergias.EditAlergiasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Alergias.AdicionarAlergiaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Alergias.ViewAlergiasActivity"
+            android:exported="false" />
+        <activity
             android:name=".Exames.EditExamesActivity"
             android:exported="false" />
         <activity

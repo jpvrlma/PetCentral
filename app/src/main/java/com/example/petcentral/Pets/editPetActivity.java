@@ -311,7 +311,7 @@ public class editPetActivity extends AppCompatActivity {
                         }
                         verificarSeAindaHaExames();
                     } else {
-                        deletarPet();
+                        deletarAlergias();
                     }
                 });
     }
@@ -323,6 +323,35 @@ public class editPetActivity extends AppCompatActivity {
                 .collection("exames").get()
                 .addOnSuccessListener(examesSnapshot -> {
                     if (examesSnapshot == null || examesSnapshot.isEmpty()) {
+                        deletarAlergias();
+                    }
+                });
+    }
+
+    private void verificarSeAindaHaAlergias() {
+        String idUsuario = mAuth.getCurrentUser().getUid();
+        db.collection("usuarios").document(idUsuario)
+                .collection("pets").document(idPet)
+                .collection("alergias").get()
+                .addOnSuccessListener(alergiasSnapshot -> {
+                    if (alergiasSnapshot == null || alergiasSnapshot.isEmpty()) {
+                        deletarPet();
+                    }
+                });
+    }
+
+    private void deletarAlergias(){
+        String idUsuario = mAuth.getCurrentUser().getUid();
+
+        db.collection("usuarios").document(idUsuario)
+                .collection("pets").document(idPet)
+                .collection("alergias").get().addOnSuccessListener(alergiasSnapshot -> {
+                    if (alergiasSnapshot != null && !alergiasSnapshot.isEmpty()) {
+                        for (DocumentSnapshot alergiaDoc : alergiasSnapshot.getDocuments()) {
+                            alergiaDoc.getReference().delete();
+                        }
+                        verificarSeAindaHaAlergias();
+                    } else {
                         deletarPet();
                     }
                 });
