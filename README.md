@@ -6,8 +6,9 @@
 
 * Registros de vacinação centralizados: Os usuários podem registrar e acompanhar as vacinas aplicadas em cada animal, com todas as informações relevantes organizadas em um único local.
 * Histórico de vacinação: É possível verificar o histórico completo de vacinas de cada animal, facilitando o acompanhamento da saúde e imunização.
-* Visualização de documentos PDF e imagens: O aplicativo permite abrir e visualizar arquivos PDF e imagens no geral.
+* Incluir exames do animal: O aplicativo permite a adição de exames, incluindo Pdfs e imagens.
 * Armazenamento e visualização de arquivos: O usuário pode armazenar e acessar arquivos públicos (ex.: documentos de saúde) via Firebase Storage.
+* Alergias: Os usuários podem registrar alergias do animal e observações no aplicativo.
 
 ## Tecnologias utilizadas
 
