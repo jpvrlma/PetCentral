@@ -40,6 +40,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
     private ArrayList<Vacinas> vacinasArrayList;
     private String idEspecie;
     private Long idadePetMili;
+    private String nomePet;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
                 .addOnSuccessListener(documentSnapshot -> {
                     if (documentSnapshot.exists()) {
                         Pet pet = documentSnapshot.toObject(Pet.class);
+                        nomePet = pet.getNome();
                         binding.textNome.setText(Objects.requireNonNull(pet).getNome());
                         binding.textEspecie.setText(pet.getEspecie() + " - " + pet.getSexo());
                         binding.textRaca.setText(pet.getRaca());
@@ -162,6 +164,7 @@ public class SelectVacinaActivity extends AppCompatActivity implements OnSelectI
             intent.putExtra("idPet", idPet);
             intent.putExtra("idEspecie", idEspecie);
             intent.putExtra("nome", nomeVacina);
+            intent.putExtra("nomePet", nomePet);
             startActivity(intent);
         }
     }

@@ -5,9 +5,13 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -16,20 +20,29 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.petcentral.Adapters.petAdapter;
+import com.example.petcentral.Adapters.proximasVacinasAdapter;
 import com.example.petcentral.Interfaces.PetInterface;
 import com.example.petcentral.Objetos.Pet;
+import com.example.petcentral.Objetos.Vacinas;
 import com.example.petcentral.R;
 import com.example.petcentral.Usuario.UserActivity;
 import com.example.petcentral.databinding.ActivityMainBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.firebase.auth.FirebaseAuth;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FieldPath;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 
 /**
@@ -45,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
     private com.example.petcentral.Adapters.petAdapter petAdapter;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
+    private proximasVacinasAdapter proximasVacinasAdapter;
+    private ArrayList<Vacinas> vacinasArrayList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +88,10 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         petAdapter = new petAdapter(this, petArrayList, this);
         recyclerView.setAdapter(petAdapter);
 
+        vacinasArrayList = new ArrayList<>();
+
         exibirRecycler();
+        carregarPets();
 
     }
 
@@ -81,6 +99,9 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
     private void clickListeners() {
         binding.floatingActionButton.setOnClickListener(v -> startActivity(new Intent(this, CadastroPetActivity.class)));
         binding.btnSettings.setOnClickListener(v -> startActivity(new Intent(this, UserActivity.class)));
+        binding.btnNotifi.setOnClickListener(v -> {
+            exibirProximasVacinas();
+        });
     }
 
     //Exibir o Recycler view de pets cadastrados
@@ -116,6 +137,73 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
         }
     }
 
+    private void exibirProximasVacinas(){
+        BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(this);
+        View view1 = LayoutInflater.from(this).inflate(R.layout.bottom_notifi, null);
+        bottomSheetDialog.setContentView(view1);
+
+        RecyclerView rv = view1.findViewById(R.id.recyclerViewProximas);
+        rv.setLayoutManager(new LinearLayoutManager(this));
+
+        proximasVacinasAdapter = new proximasVacinasAdapter(this, vacinasArrayList);
+        rv.setAdapter(proximasVacinasAdapter);
+
+        if (vacinasArrayList.isEmpty()) {
+            TextView titulo = view1.findViewById(R.id.titulo);
+            titulo.setText("Não há vacinas próximas");
+        }
+
+        bottomSheetDialog.setOnDismissListener(dialog -> {
+            carregarPets();
+        });
+
+        bottomSheetDialog.show();
+    }
+
+    private void carregarPets(){
+        vacinasArrayList.clear();
+        db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").get()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()){
+                        Log.e("ERRO FIRESTORE", task.getException().getMessage());
+                        return;
+                    }
+                    for (QueryDocumentSnapshot petdc : task.getResult()){
+                        String petId = petdc.getId();
+                        carregarVacinasPorPet(petId);
+                    }
+                });
+    }
+
+    private void carregarVacinasPorPet(String petId){
+        CollectionReference vacinasRef = db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
+                .collection("pets").document(petId)
+                .collection("vacinas");
+
+        Date hoje = new Date();
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(hoje);
+        calendar.add(Calendar.DAY_OF_MONTH, 3);
+        Date tresDias = calendar.getTime();
+
+        vacinasRef.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()){
+                Log.e("ERRO FIRESTORE", task.getException().getMessage());
+                return;
+            }
+            for (QueryDocumentSnapshot vacinasdc : task.getResult()){
+                Vacinas vacinas = vacinasdc.toObject(Vacinas.class);
+                vacinas.setId(vacinasdc.getId());
+
+                Date proximaDose = vacinas.getProximaDose().toDate();
+                if (proximaDose.after(hoje) && proximaDose.before(tresDias)){
+                    vacinasArrayList.add(vacinas);
+                }
+            }
+        });
+    }
+
     //Métodos da interface
     @Override
     public void onEditClick(int position) {
@@ -143,4 +231,7 @@ public class MainActivity extends AppCompatActivity implements PetInterface {
     public void onBackPressed() {
 
     }
+
+
+
 }

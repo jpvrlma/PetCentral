@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">CENTRAL DO PET</string>
+    <string name="app_name">Central do Pet</string>
     <string name="login_saudacao">Bem Vindo!</string>
     <string name="login_info">Insira suas informações para realizar o Login</string>
     <string name="hint_email">Email</string>
@@ -11,7 +11,7 @@
     <string name="reset_insira">Insira seu email!</string>
     <string name="reset_btn_redefinir">Redefinir a senha</string>
     <string name="main_saudacao">Saudação</string>
-    <string name="main_seus_pets">Seus Pets</string>
+    <string name="main_seus_pets">Pets</string>
     <string name="cadastro_faca">Faça seu Cadastro!</string>
     <string name="hint_nome">Nome</string>
     <string name="btn_cadastro">Cadastrar</string>
@@ -46,13 +46,6 @@
         <item>Outro</item>
     </string-array>
 
-    <string-array name="Lembrete">
-        <item>1 dia</item>
-        <item>2 dias</item>
-        <item>3 dias</item>
-        <item>4 dias</item>
-        <item>5 dias</item>
-    </string-array>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="prompt_password">Password</string>

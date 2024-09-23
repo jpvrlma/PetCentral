@@ -53,6 +53,21 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textDia" />
 
+    <Button
+        android:id="@+id/btn_notifi"
+        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
+        android:layout_width="60dp"
+        android:layout_height="45dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="8dp"
+        android:backgroundTint="@color/md_theme_secondaryContainer"
+        app:icon="@drawable/bell_regular"
+        app:iconGravity="textEnd"
+        app:iconSize="24dp"
+        app:iconTint="@color/md_theme_primary"
+        app:layout_constraintEnd_toStartOf="@+id/btn_settings"
+        app:layout_constraintTop_toBottomOf="@+id/textDia" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"

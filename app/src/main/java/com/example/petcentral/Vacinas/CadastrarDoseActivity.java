@@ -160,6 +160,7 @@ public class CadastrarDoseActivity extends AppCompatActivity {
         String idPet = getIntent().getStringExtra("idPet");
         String idVacina = getIntent().getStringExtra("idVacina");
         String nome = getIntent().getStringExtra("nome");
+        String nomePet = getIntent().getStringExtra("nomePet");
 
         if (intervaloDias != null && !intervaloDias.isEmpty()) {
             Long primeiroIntervalo = intervaloDias.get(0);
@@ -169,6 +170,8 @@ public class CadastrarDoseActivity extends AppCompatActivity {
             vacina.put("dataAplicacao", dataAplicacao);
             vacina.put("proximaDose", proximaDose);
             vacina.put("nome", nome);
+            vacina.put("nomePet",nomePet);
+
 
             db.collection("usuarios").document(mAuth.getCurrentUser().getUid())
                     .collection("pets").document(idPet)
