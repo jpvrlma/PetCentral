@@ -38,6 +38,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:gravity="center_vertical">
+
                 <TextView
                 android:id="@+id/textNome"
                 android:layout_width="0dp"
@@ -57,6 +58,7 @@
 
             <TextView
                 android:id="@+id/textEspecie"
+                android:textColor="@color/md_theme_onSurface"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="especie_pet"
@@ -64,6 +66,7 @@
 
             <TextView
                 android:id="@+id/textRaca"
+                android:textColor="@color/md_theme_onSurface"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="especie_raca"
@@ -71,6 +74,7 @@
 
             <TextView
                 android:id="@+id/textIdade"
+                android:textColor="@color/md_theme_onSurface"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="especie_idade"

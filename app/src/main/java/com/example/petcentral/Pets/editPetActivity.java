@@ -178,6 +178,7 @@ public class editPetActivity extends AppCompatActivity {
                             }
 
                             binding.main.setVisibility(View.VISIBLE);
+                            binding.menuEspecie.setEnabled(false);
                         }
                     } else {
                         Toast.makeText(this, "Erro ao carregar pet", Toast.LENGTH_SHORT).show();
